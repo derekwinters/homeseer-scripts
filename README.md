@@ -1,37 +1,28 @@
-## Welcome to GitHub Pages
+# HomeSeer Scripts
 
-You can use the [editor on GitHub](https://github.com/derekwinters/homeseer-scripts/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This is a collection of vb.net scripts that I have written for my HomeSeer installation.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Description
 
-### Markdown
+The folder standalone-scripts is the original collection of scripts that were written as they were
+needed, sharing code and functions from other scripts as needed. Over time, this has gotten messy,
+as a lot of code and functions has been shared.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+A new collection of files will be replacing these files that are built in a more single-purpose
+fashion. That process is currently a work in progress.
 
-```markdown
-Syntax highlighted code block
+## Purpose
 
-# Header 1
-## Header 2
-### Header 3
+I started writing these scripts as my HomeSeer setup got more and more complicated, with status
+changes triggering tracking device changes, which would trigger additional events, and so on. When
+I had a system crash, I decided instead of restoring from a backup, I would take that opportunity
+to redesign my system to handle the complex decision making in code instead of the relatively
+simple IFTTT-style logic available in the events configuration (although it is still more powerful
+than IFTTT).
 
-- Bulleted
-- List
+## Contributing
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/derekwinters/homeseer-scripts/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+I'm putting this out on the internet so anyone looking to do similar tasks as I am can save some
+work. I tend to learn from copying and changing, and maybe others do too. Take these and use them
+however you want. If anyone actually wants to fork or contribute, go ahead. I am actually using
+these scripts in my setup, however, so forking (or just copying and changing) is probably easier.
