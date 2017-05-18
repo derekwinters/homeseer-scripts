@@ -38,6 +38,10 @@ Sub Main(Parms as Object)
 		hs.SetDeviceValueByRef(DerekTrack,TrackAway,True)
 		hs.WriteLog("Occupancy", "Derek left")
 		
+	'Else
+	
+		'hs.WriteLog("Occupancy", "Derek's status is correct")
+		
 	End If
 
 	' ==========================================================================
@@ -55,6 +59,10 @@ Sub Main(Parms as Object)
 		' If device is offline and Amy is set to home, change it
 		hs.SetDeviceValueByRef(AmyTrack,TrackAway,True)
 		hs.WriteLog("Occupancy", "Amy left")
+		
+	'Else
+	
+		'hs.WriteLog("Occupancy", "Amy's status is correct")
 		
 	End If
 
@@ -110,9 +118,9 @@ End Sub
 Sub Babysitter(BabysitterTrack As Integer)
 
 	If ( hs.DeviceValue(BabysitterTrack) = 100 ) Then
-		
-		hs.SetDeviceValueByRef(BabysitterTrack,0,True)
-		hs.WriteLog("Occupancy", "Babysitter tracking stopped")
+
+        hs.SetDeviceValueByRef(BabysitterTrack, 50, True)
+        hs.WriteLog("Occupancy", "Babysitter tracking stopped")
 		
 	End If
 
