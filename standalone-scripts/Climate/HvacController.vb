@@ -13,6 +13,8 @@
 '     Created MakeTheCapiHappy function
 ' 2017-04-27
 '     Included AverageTemperature in calculations for set points
+' 2017-05-17
+'     Changed set points to virtual devices for easier control in phone app
 '
 ' ==============================================================================
 ' Temperature Reasoning
@@ -91,38 +93,38 @@ Sub Main(parms As Object)
         ' ======================================================================
         ' Night ( 2100 to 0500 )
         ' ======================================================================
-        SetHeat = 68
-        SetCool = 72
-        SetMode = 0
+        SetHeat = hs.DeviceValue(186)
+        SetCool = hs.DeviceValue(188)
+        SetMode = hs.DeviceValue(187)
     ElseIf (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "" And CurrentHour >= 5 And CurrentHour < 9) OrElse parms = "Morning") Then
         ' ======================================================================
         ' Morning ( 0500 to 0900 )
         ' ======================================================================
         If (TemperatureHigh > 50) Then
-            SetHeat = 71
+            SetHeat = hs.DeviceValue(178) - 1
         Else
-            SetHeat = 72
+            SetHeat = hs.DeviceValue(178)
         End If
-        SetCool = 72
-        SetMode = 1
+        SetCool = hs.DeviceValue(177)
+        SetMode = hs.DeviceValue(179)
     ElseIf (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "" And CurrentHour >= 19 And CurrentHour < 21) OrElse parms = "Evening") Then
         ' ======================================================================
         ' Evening ( 1900 to 2100 )
         ' ======================================================================
-        SetHeat = 70
-        SetCool = 74
-        SetMode = 0
+        SetHeat = hs.DeviceValue(183)
+        SetCool = hs.DeviceValue(185)
+        SetMode = hs.DeviceValue(184)
     ElseIf (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "") OrElse (parms = "Day")) Then
         ' ======================================================================
         ' Day ( 0900 to 1900 )
         ' ======================================================================
         If (TemperatureHigh > 50) Then
-            SetHeat = 69
+            SetHeat = hs.DeviceValue(180) - 1
         Else
-            SetHeat = 70
+            SetHeat = hs.DeviceValue(180)
         End If
-        SetCool = 76
-        SetMode = 1
+        SetCool = hs.DeviceValue(182)
+        SetMode = hs.DeviceValue(181)
     ElseIf (OccupancyMode = 0) Then
         ' ======================================================================
         ' Vacation
