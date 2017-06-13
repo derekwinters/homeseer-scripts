@@ -15,6 +15,8 @@
 '     Included AverageTemperature in calculations for set points
 ' 2017-05-17
 '     Changed set points to virtual devices for easier control in phone app
+' 2017-06-12
+'     Added fix for automatic heat/cool mode
 '
 ' ==============================================================================
 ' Temperature Reasoning
@@ -137,7 +139,7 @@ Sub Main(parms As Object)
         ' Away
         ' ======================================================================
         SetHeat = 65
-        SetCool = 79
+        SetCool = 75
         SetMode = 0
     End If
 
@@ -148,6 +150,21 @@ Sub Main(parms As Object)
         SetCool = SetCool + 2
     ElseIf (OutsideTemperature < 0) Then
         SetHeat = SetHeat - 2
+    End If
+
+    ' ==========================================================================
+    ' Additional weather forecast alterations
+    ' ==========================================================================
+    ' Setting the thermostat to automatic heat/cool mode causes unneccessary use
+    ' during the spring and fall. These alterations should allow the use of auto
+    ' mode selection year round without issue.
+    ' ==========================================================================
+    ' If the high for the day is above 60, drop the heat temp by 20 degrees
+    ' If the high for the day is below 50, raise the cool temp by 20 degrees
+    If (TemperatureHigh > 60) Then
+        SetHeat = SetHeat - 20
+    ElseIf (TemperatureLow < 50) Then
+        SetCool = SetCool + 20
     End If
 
     ' ==========================================================================
