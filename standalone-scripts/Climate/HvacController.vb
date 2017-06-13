@@ -159,10 +159,10 @@ Sub Main(parms As Object)
     ' during the spring and fall. These alterations should allow the use of auto
     ' mode selection year round without issue.
     ' ==========================================================================
-    ' If the high for the day is above 60, drop the heat temp by 20 degrees
+    ' If the high for the day is above 60, drop the heat temp by 10 degrees
     ' If the high for the day is below 50, raise the cool temp by 20 degrees
     If (TemperatureHigh > 60) Then
-        SetHeat = SetHeat - 20
+        SetHeat = SetHeat - 10
     ElseIf (TemperatureHigh < 50) Then
         SetCool = SetCool + 20
     End If
