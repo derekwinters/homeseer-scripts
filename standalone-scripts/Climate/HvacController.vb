@@ -163,7 +163,7 @@ Sub Main(parms As Object)
     ' If the high for the day is below 50, raise the cool temp by 20 degrees
     If (TemperatureHigh > 60) Then
         SetHeat = SetHeat - 20
-    ElseIf (TemperatureLow < 50) Then
+    ElseIf (TemperatureHigh < 50) Then
         SetCool = SetCool + 20
     End If
 
