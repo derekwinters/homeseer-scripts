@@ -35,47 +35,47 @@ Sub Main(parms As Object)
 		Else
 			Body = Body & "Garage door is closed<br />"
 		End If
-		
-		' ======================================================================
-		' Check the front door
-		' ======================================================================
-	'	If ( hs.DeviceValue("89") = 255 ) Then
-	'		Body = Body & "Front door is locked<br />"
-	'	Else
-	'		Body = Body & " - Front door is unlocked - <br />"
-	'		Alarm = True
-	'	End If
-		
-		' ======================================================================
-		' Check the patio door
-		' ======================================================================
-		If ( hs.DeviceValue("68") <> 0 ) Then
-			Body = Body & " - Patio door is open - <br />"
-			Alarm = True
-		Else
-			Body = Body & "Patio door is closed<br />"
-		End If
-		
-		
-		' ======================================================================
-		' Armed Only Devices
-		' ======================================================================
-		' These devices will be included in the report, but will only trigger an
-		' alarm if the system is fully armed.
-		' ======================================================================
-		' Family Room Motion Sensor
-		' ======================================================================
-		If (hs.DeviceValue("112") <> 0 ) Then
-			Body = Body & "- Motion in Family Room -<br />"
-			If ( hs.DeviceValue("28") = 100 ) Then
-				Alarm = True
-			End If
-		Else
-			Body = Body & "No motion in Family Room<br />"
-		End If
-		
-	Else
-		hs.WriteLog("Security System", "Security system event triggered. System is disarmed. No alert sent.")
+
+        ' ======================================================================
+        ' Check the front door
+        ' ======================================================================
+        If (hs.DeviceValue("201") = 255) Then
+            Body = Body & "Front door is locked<br />"
+        Else
+            Body = Body & " - Front door is unlocked - <br />"
+            Alarm = True
+        End If
+
+        ' ======================================================================
+        ' Check the patio door
+        ' ======================================================================
+        If (hs.DeviceValue("68") <> 0) Then
+            Body = Body & " - Patio door is open - <br />"
+            Alarm = True
+        Else
+            Body = Body & "Patio door is closed<br />"
+        End If
+
+
+        ' ======================================================================
+        ' Armed Only Devices
+        ' ======================================================================
+        ' These devices will be included in the report, but will only trigger an
+        ' alarm if the system is fully armed.
+        ' ======================================================================
+        ' Family Room Motion Sensor
+        ' ======================================================================
+        If (hs.DeviceValue("112") <> 0) Then
+            Body = Body & "- Motion in Family Room -<br />"
+            If (hs.DeviceValue("28") = 100) Then
+                Alarm = True
+            End If
+        Else
+            Body = Body & "No motion in Family Room<br />"
+        End If
+
+    Else
+            hs.WriteLog("Security System", "Security system event triggered. System is disarmed. No alert sent.")
 	End If
 	
 	' ======================================================================
