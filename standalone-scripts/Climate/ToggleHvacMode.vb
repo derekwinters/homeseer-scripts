@@ -4,27 +4,17 @@ Sub Main(parms As Object)
 	' Set Variables
 	' ==========================================================================
 	Dim Mode As Integer = 46
-	
-	' ==========================================================================
-	' Toggle
-	' ==========================================================================
-	If ( hs.DeviceValue(Mode) = 0 ) Then
-		' OFF to HEAT
-		MakeTheCapiHappy("Auto", Mode, 1 )
-	
-	Else If ( hs.DeviceValue(Mode) = 1 ) Then
-		' HEAT to COOL
-		MakeTheCapiHappy("Auto", Mode, 2 )
-		
-	Else If ( hs.DeviceValue(Mode) = 2 ) Then
-		' COOL to AUTO
-		MakeTheCapiHappy("Auto", Mode, 3 )
-		
-	Else
-		' AUTO to OFF
-		MakeTheCapiHappy("Auto", Mode, 0 )
-		
-	End If
+
+    ' ==========================================================================
+    ' Toggle
+    ' ==========================================================================
+    If (hs.DeviceValue(Mode) = 0) Then
+        ' OFF to AUTO
+        MakeTheCapiHappy("Auto", Mode, 3)
+    Else
+        ' AUTO to OFF
+        MakeTheCapiHappy("Auto", Mode, 0)
+    End If
 	
 End Sub
 
