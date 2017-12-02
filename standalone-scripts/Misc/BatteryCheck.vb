@@ -35,7 +35,7 @@ Sub Main(Parms As Object)
 
     If (Total > 0) Then
         hs.SendEmail(hs.DeviceString(168), hs.DeviceString(174), "", "", "Battery Alert", Body, "")
-        hs.SendEmail(hs.DeviceString(167), hs.DeviceString(174), "", "", "Battery Alert", Body, "")
+        'hs.SendEmail(hs.DeviceString(167), hs.DeviceString(174), "", "", "Battery Alert", Body, "")
     End If
 
 End Sub
