@@ -42,10 +42,22 @@ Sub Main(parms As Object)
 			hs.SetDeviceValueByRef("92",0,True)
 		End If
 		
+		' If 'Heading Home' is enabled, disable it.
+		If ( hs.DeviceValue("211") = 100 ) Then
+			hs.WriteLog("Security System", "HVAC Disabling Heading Home")
+			hs.SetDeviceValueByRef("211",0,True)
+		End If
+		
 	Else
 		' The time is during the perimeter period. Set accordingly
 		hs.SetDeviceValueByRef(SecurityMode,SecurityModePerimeter,True)
 		hs.WriteLog("Security System", "Correct state determined to be PERIMETER")
+		
+		' If 'Heading Home' is enabled, disable it.
+		If ( hs.DeviceValue("211") = 100 ) Then
+			hs.WriteLog("Security System", "HVAC Disabling Heading Home")
+			hs.SetDeviceValueByRef("211",0,True)
+		End If
 		
 	End If
 	
