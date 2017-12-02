@@ -17,6 +17,10 @@
 '     Changed set points to virtual devices for easier control in phone app
 ' 2017-06-12
 '     Added fix for automatic heat/cool mode
+' 2017-08-26
+'     Additional scaling based on outside temperature
+' 2017-12-01
+'     Refactor time-based determinations
 '
 ' ==============================================================================
 ' Temperature Reasoning
@@ -89,69 +93,84 @@ Sub Main(parms As Object)
     ' Current Operating Mode
     Dim CurrentOperatingMode As Integer = hs.DeviceValue("46")
 
+	' ==============================================================================
+	' If Heading Home is enabled, mock Occupancy
+	' ==============================================================================
+	If ( hs.DeviceValue("211") = 100 ) Then
+		hs.WriteLog("HVAC Automation", "Heading home is enabled. Mocking OccupancyMode to 100")
+		OccupancyMode = 100
+	End If
+	
     If (ThermostatHold = 0) Then
-        ' ==========================================================================
-        ' Make the decisions based on time and occupancy
-        ' ==========================================================================
-        If (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "" And (CurrentHour < 5 OrElse CurrentHour >= 21)) OrElse parms = "Night") Then
-            ' ======================================================================
-            ' Night ( 2100 to 0500 )
-            ' ======================================================================
-            SetHeat = hs.DeviceValue(186)
-            SetCool = hs.DeviceValue(188)
-            SetMode = hs.DeviceValue(187)
-        ElseIf (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "" And CurrentHour >= 5 And CurrentHour < 9) OrElse parms = "Morning") Then
-            ' ======================================================================
-            ' Morning ( 0500 to 0900 )
-            ' ======================================================================
-            If (TemperatureHigh > 50) Then
-                SetHeat = hs.DeviceValue(178) - 1
-            Else
-                SetHeat = hs.DeviceValue(178)
-            End If
-            SetCool = hs.DeviceValue(177)
-            SetMode = hs.DeviceValue(179)
-        ElseIf (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "" And CurrentHour >= 19 And CurrentHour < 21) OrElse parms = "Evening") Then
-            ' ======================================================================
-            ' Evening ( 1900 to 2100 )
-            ' ======================================================================
-            SetHeat = hs.DeviceValue(183)
-            SetCool = hs.DeviceValue(185)
-            SetMode = hs.DeviceValue(184)
-        ElseIf (((OccupancyMode = 100 OrElse OccupancyMode = 75) And parms = "") OrElse (parms = "Day")) Then
-            ' ======================================================================
-            ' Day ( 0900 to 1900 )
-            ' ======================================================================
-            If (TemperatureHigh > 50) Then
-                SetHeat = hs.DeviceValue(180) - 1
-            Else
-                SetHeat = hs.DeviceValue(180)
-            End If
-            SetCool = hs.DeviceValue(182)
-            SetMode = hs.DeviceValue(181)
-        ElseIf (OccupancyMode = 0) Then
-            ' ======================================================================
+	
+		If (OccupancyMode = 100 OrElse OccupancyMode = 75 ) Then
+		
+			' Use the value of the tracking devices to set the thermostat based
+			' on the time of day.
+			Select Case CurrentHour
+				Case < 3
+					' Start cooling earlier in the morning to help get the temp
+					' lower before it starts to warm up outside.
+					SetHeat = hs.DeviceValue(186) ' Night Heat
+					SetCool = hs.DeviceValue(177) ' Morning Cool
+					SetMode = hs.DeviceValue(187) ' Night Mode
+				Case < 5
+					SetHeat = hs.DeviceValue(186)
+					SetCool = hs.DeviceValue(188)
+					SetMode = hs.DeviceValue(187)
+				Case < 9
+					SetHeat = hs.DeviceValue(178)
+					SetCool = hs.DeviceValue(177)
+					SetMode = hs.DeviceValue(179)
+				Case >= 21
+					SetHeat = hs.DeviceValue(186)
+					SetCool = hs.DeviceValue(188)
+					SetMode = hs.DeviceValue(187)
+				Case >= 19
+					SetHeat = hs.DeviceValue(183)
+					SetCool = hs.DeviceValue(185)
+					SetMode = hs.DeviceValue(184)
+				Case Else
+					' General daytime values
+					SetHeat = hs.DeviceValue(180)
+					SetCool = hs.DeviceValue(182)
+					SetMode = hs.DeviceValue(181)
+			End Select
+		
+			' If it's earlier than 4PM and the high for the day is higher than
+			' 50, lower the temperature by 1 to help from making the house too
+			' hot during the day.
+			If (TemperatureHigh > 50 And CurrentHour < 16) Then
+				SetHeat = SetHeat - 1
+			End If
+			
+		Else If ( OccupancyMode = 0 ) Then
             ' Vacation
-            ' ======================================================================
             SetHeat = 50
             SetCool = 85
             SetMode = 0
-        Else
-            ' ======================================================================
+		Else
             ' Away
-            ' ======================================================================
             SetHeat = 65
             SetCool = 75
             SetMode = 0
-        End If
+		End If
 
         ' ==========================================================================
         ' Modify the set points based on the outside temperature
         ' ==========================================================================
         If (OutsideTemperature > 100) Then
-            SetCool = SetCool + 2
+            SetCool = SetCool + 3
+		ElseIf (OutsideTemperature > 90) Then
+			SetCool = SetCool + 2
+		ElseIf (OutsideTemperature > 80) Then
+			SetCool = SetCool + 1
         ElseIf (OutsideTemperature < 0) Then
-            SetHeat = SetHeat - 2
+            SetHeat = SetHeat - 3
+		ElseIf (OutsideTemperature < 10) Then
+			SetHeat = SetHeat - 2
+		ElseIf (OutsideTemperature < 20) Then
+			SetHeat = SetHeat - 1
         End If
 
         ' ==========================================================================
@@ -172,31 +191,30 @@ Sub Main(parms As Object)
         ' ==========================================================================
         ' Average Temperature Alterations
         ' ==========================================================================
+		' If the system is not active, check if the set points should be adjusted
+		' based on the AverageTemperature. If the difference is >= 2, alter the set
+		' point. If the difference is >= 1, turn the fan on.
         If (CurrentOperatingState = 0) Then
-            ' If the system is not active, check if we should adjust the set points
-            ' to get the average temperature to within a reasonable range.
             If (CurrentOperatingMode = 1) Then
-                ' If we are heating, compare the heat set point to the average
-                If ((AverageTemperature > SetHeat) And ((AverageTemperature - SetHeat) > 2)) Then
-                    ' If the Average temperature is more than 2 degrees higher than
-                    ' the desired temperature, lower the set point 2 degrees
-                    SetHeat = SetHeat - 2
-                ElseIf ((SetHeat > AverageTemperature) And ((SetHeat - AverageTemperature) > 2)) Then
-                    ' If the average temperature is more than 2 degrees below the
-                    ' desired temperature, raise the set point 2 degrees
-                    SetHeat = SetHeat + 2
-                End If
+				If (Math.Abs(AverageTemperature - SetHeat) >= 2) Then
+					If (AverageTemperature > SetHeat) Then
+						SetHeat = SetHeat - 2
+					Else
+						SetHeat = SetHeat + 2
+					End If
+				ElseIf (Math.Abs(AverageTemperature - SetHeat) >= 1) Then
+					SetMode = 1
+				End If
             ElseIf (CurrentOperatingMode = 2) Then
-                ' If we are cooling, compare the cool set point to the average
-                If ((AverageTemperature > SetCool) And ((AverageTemperature - SetCool) > 2)) Then
-                    ' If the average temperature is more than 2 degrees higher than
-                    ' the desired temperature, lower the set point 2 degrees
-                    SetCool = SetCool - 2
-                ElseIf ((SetCool > AverageTemperature) And ((SetCool - AverageTemperature) > 2)) Then
-                    ' If the average temperature is more than 2 degrees below the
-                    ' desired temperature, raise the set point 2 degrees
-                    SetCool = SetCool + 2
-                End If
+				If (Math.Abs(AverageTemperature - SetCool) >= 2) Then
+					If (AverageTemperature > SetCool) Then
+						SetCool = SetCool - 2
+					Else
+						SetCool = SetCool + 2
+					End If
+				ElseIf (Math.Abs(AverageTemperature - SetCool) >= 1) Then
+					SetMode = 1
+				End If
             End If
         End If
 
@@ -231,9 +249,9 @@ Sub Main(parms As Object)
         ' Output
         ' ==========================================================================
         If (SetMode = 0) Then
-            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: Auto)")
+            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: Auto, Avg: " & AverageTemperature &")")
         Else
-            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: On)")
+            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: On, Avg: " & AverageTemperature &")")
         End If
     Else
         hs.WriteLog("HVAC Automation", "Thermostat HOLD is enabled. No changes made.")

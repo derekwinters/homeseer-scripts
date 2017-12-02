@@ -4,7 +4,7 @@ Imports System.IO
 Sub Main(parms As Object)
 
 	' Use a new file each day
-	Dim strFile As String = hs.DeviceString(176) & "\HVACLogs\HvacOperationLog-" & DateTime.Now.ToString("yyyyMMdd") & ".csv"
+	Dim strFile As String = "C:\Logs\HVACLogs\HvacOperationLog-" & DateTime.Now.ToString("yyyyMMdd") & ".csv"
 
 	' Check if the file exists
 	Dim fileExists As Boolean = File.Exists(strFile)
