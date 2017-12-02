@@ -24,9 +24,8 @@ Sub Main(Parms As Object)
 
         If (Device.Device_Type_String(hs) = "Z-Wave Battery") Then
             hs.WriteLog("HVAC Automation", "Found a battery device (ReferenceID: " & Device.ref(hs) & ", Value: " & hs.DeviceValue(Device.ref(hs)) & ")")
-            ' If the battery is below 15%, and it's not the power sensor which doesn't have a battery installed, add to alert body
-            If (hs.DeviceValue(Device.ref(hs)) < 15 And Device.ref(hs) <> 87) Then
-                Body = Body & Device.Location(hs) & " " & Device.Name(hs) & ": " & hs.DeviceValue(Device.ref(hs))
+            If (hs.DeviceValue(Device.ref(hs)) < 15) Then
+                Body = Body & Device.Location(hs) & " " & Device.Name(hs) '& ": " & Device.Value(hs)
                 Total = Total + 1
             End If
 
@@ -35,8 +34,8 @@ Sub Main(Parms As Object)
     Loop
 
     If (Total > 0) Then
-        hs.SendEmail(hs.DeviceString(168), hs.DeviceString(174), "", "", "Low Battery Alert", Body, "")
-        hs.SendEmail(hs.DeviceString(167), hs.DeviceString(174), "", "", "Low Battery Alert", Body, "")
+        hs.SendEmail(hs.DeviceString(168), hs.DeviceString(174), "", "", "Battery Alert", Body, "")
+        hs.SendEmail(hs.DeviceString(167), hs.DeviceString(174), "", "", "Battery Alert", Body, "")
     End If
 
 End Sub
