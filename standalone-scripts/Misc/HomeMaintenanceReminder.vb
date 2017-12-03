@@ -28,40 +28,48 @@ Sub Main(Param as Object)
     If (Message = "") Then
         hs.WriteLog("Maintenance Reminder", "Maintenance reminder failed, invalid parameter passed to function.")
     Else
-        ' Set up enumerator
-        Dim Device As Scheduler.Classes.DeviceClass
-        Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
-
-        ' Start
-        Enumerator = hs.GetDeviceEnumerator
-
-        ' Check
-        If (Enumerator Is Nothing) Then
-            hs.WriteLog("MMS Messaging", "Error getting enumerator")
-            Exit Sub
-        End If
-
-        ' Loop and send messages
-        Do While Not Enumerator.Finished
-            Device = Enumerator.GetNext
-
-            If (Device Is Nothing) Then
-                Continue Do
-            End If
-
-            ' If the device type string is MMSPhoneNumber and the device is on,
-            ' send the message. Checking if the device is off allows for easily
-            ' disabling sending to a specific number without modifying scripts.
-            If (Device.Device_Type_String(hs) = "MMSPhoneNumber") Then
-                If (hs.DeviceValue(Device.ref(hs)) = 100) Then
-                    hs.SendEmail(hs.DeviceString(Device.ref(hs)), hs.DeviceString(174), "", "", "Maintenance Reminder", Message, "")
-                Else
-                    hs.WriteLog("MMS Messaging", "Device is disabled for messaging (ReferenceID: " & Device.ref(hs) & ")")
-                End If
-            End If
-
-        Loop
-
+		SendMessage("Maintenance Reminder",Message)
     End If
 	
 end Sub
+
+' ==============================================================================
+' Send Message
+' ==============================================================================
+Sub SendMessage(SubjectString As String, MessageString As String)
+
+    ' Set up enumerator
+	Dim Device As Scheduler.Classes.DeviceClass
+	Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
+
+	' Start
+	Enumerator = hs.GetDeviceEnumerator
+
+	' Check
+	If (Enumerator Is Nothing) Then
+		hs.WriteLog("MMS Messaging", "Error getting enumerator")
+		Exit Sub
+	End If
+
+	' Loop and send messages
+	Do While Not Enumerator.Finished
+		Device = Enumerator.GetNext
+
+		If (Device Is Nothing) Then
+			Continue Do
+		End If
+
+		' If the device type string is MMSPhoneNumber and the device is on,
+		' send the message. Checking if the device is off allows for easily
+		' disabling sending to a specific number without modifying scripts.
+		If (Device.Device_Type_String(hs) = "MMSPhoneNumber") Then
+			If (hs.DeviceValue(Device.ref(hs)) = 100) Then
+				hs.SendEmail(hs.DeviceString(Device.ref(hs)), hs.DeviceString(174), "", "", SubjectString, MessageString, "")
+			Else
+				hs.WriteLog("MMS Messaging", "Device is disabled for messaging (ReferenceID: " & Device.ref(hs) & ")")
+			End If
+		End If
+
+	Loop
+	
+End Sub
