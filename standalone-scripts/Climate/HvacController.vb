@@ -122,7 +122,7 @@ Sub Main(parms As Object)
 					SetHeat = hs.DeviceValue(178)
 					SetCool = hs.DeviceValue(177)
 					SetMode = hs.DeviceValue(179)
-				Case >= 21
+				Case >= 23
 					SetHeat = hs.DeviceValue(186)
 					SetCool = hs.DeviceValue(188)
 					SetMode = hs.DeviceValue(187)
