@@ -160,16 +160,12 @@ Sub Main(parms As Object)
         ' Modify the set points based on the outside temperature
         ' ==========================================================================
         If (OutsideTemperature > 100) Then
-            SetCool = SetCool + 3
-		ElseIf (OutsideTemperature > 90) Then
-			SetCool = SetCool + 2
+            SetCool = SetCool + 2
 		ElseIf (OutsideTemperature > 80) Then
 			SetCool = SetCool + 1
-        ElseIf (OutsideTemperature < 0) Then
-            SetHeat = SetHeat - 3
-		ElseIf (OutsideTemperature < 10) Then
+		ElseIf (OutsideTemperature < 0) Then
 			SetHeat = SetHeat - 2
-		ElseIf (OutsideTemperature < 20) Then
+		ElseIf (OutsideTemperature < 10) Then
 			SetHeat = SetHeat - 1
         End If
 
