@@ -198,7 +198,7 @@ Sub Main(parms As Object)
 					Else
 						SetHeat = SetHeat + 2
 					End If
-				ElseIf (Math.Abs(AverageTemperature - SetHeat) >= 1) Then
+				ElseIf (Math.Abs(AverageTemperature - SetHeat) > 0) Then
 					SetMode = 1
 				End If
             ElseIf (CurrentOperatingMode = 2) Then
@@ -208,7 +208,7 @@ Sub Main(parms As Object)
 					Else
 						SetCool = SetCool + 2
 					End If
-				ElseIf (Math.Abs(AverageTemperature - SetCool) >= 1) Then
+				ElseIf (Math.Abs(AverageTemperature - SetCool) > 0) Then
 					SetMode = 1
 				End If
             End If
