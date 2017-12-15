@@ -6,22 +6,6 @@
 '
 ' Author: Derek Winters
 '
-' 2017-03-26
-'     Original Script
-' 2017-03-27
-'     Modified set points for COOL
-'     Created MakeTheCapiHappy function
-' 2017-04-27
-'     Included AverageTemperature in calculations for set points
-' 2017-05-17
-'     Changed set points to virtual devices for easier control in phone app
-' 2017-06-12
-'     Added fix for automatic heat/cool mode
-' 2017-08-26
-'     Additional scaling based on outside temperature
-' 2017-12-01
-'     Refactor time-based determinations
-'
 ' ==============================================================================
 ' Temperature Reasoning
 ' ==============================================================================
@@ -169,13 +153,13 @@ Sub Main(parms As Object)
 			SetHeat = SetHeat - 1
         End If
 
-        ' ==========================================================================
+        ' ======================================================================
         ' Additional weather forecast alterations
-        ' ==========================================================================
-        ' Setting the thermostat to automatic heat/cool mode causes unneccessary use
-        ' during the spring and fall. These alterations should allow the use of auto
-        ' mode selection year round without issue.
-        ' ==========================================================================
+        ' ======================================================================
+        ' Setting the thermostat to automatic heat/cool mode causes unneccessary
+		' during the spring and fall. These alterations should allow the use of
+		' auto mode selection year round without issue.
+        ' ======================================================================
         ' If the high for the day is above 60, drop the heat temp by 10 degrees
         ' If the high for the day is below 50, raise the cool temp by 20 degrees
         If (TemperatureHigh > 60) Then
@@ -184,39 +168,38 @@ Sub Main(parms As Object)
             SetCool = SetCool + 20
         End If
 
-        ' ==========================================================================
+        ' ======================================================================
         ' Average Temperature Alterations
-        ' ==========================================================================
-		' If the system is not active, check if the set points should be adjusted
-		' based on the AverageTemperature. If the difference is >= 2, alter the set
-		' point. If the difference is >= 1, turn the fan on.
+        ' ======================================================================
+		' If the system is not active, check if the set points should be
+		' adjusted based on the AverageTemperature.
         If (CurrentOperatingState = 0) Then
-            If (CurrentOperatingMode = 1) Then
-				If (Math.Abs(AverageTemperature - SetHeat) >= 2) Then
-					If (AverageTemperature > SetHeat) Then
-						SetHeat = SetHeat - 2
-					Else
-						SetHeat = SetHeat + 2
-					End If
-				ElseIf (Math.Abs(AverageTemperature - SetHeat) > 0) Then
-					SetMode = 1
+			' Adjust Heating
+			If (Math.Abs(AverageTemperature - SetHeat) >= 2) Then
+				If (AverageTemperature > SetHeat) Then
+					SetHeat = SetHeat - 2
+				Else
+					SetHeat = SetHeat + 2
 				End If
-            ElseIf (CurrentOperatingMode = 2) Then
-				If (Math.Abs(AverageTemperature - SetCool) >= 2) Then
-					If (AverageTemperature > SetCool) Then
-						SetCool = SetCool - 2
-					Else
-						SetCool = SetCool + 2
-					End If
-				ElseIf (Math.Abs(AverageTemperature - SetCool) > 0) Then
-					SetMode = 1
+			ElseIf (Math.Abs(AverageTemperature - SetHeat) >= 1) Then
+				SetMode = 1
+			End If
+		
+			' Adjust Cooling
+			If (Math.Abs(AverageTemperature - SetCool) >= 2) Then
+				If (AverageTemperature > SetCool) Then
+					SetCool = SetCool - 2
+				Else
+					SetCool = SetCool + 2
 				End If
-            End If
+			ElseIf (Math.Abs(AverageTemperature - SetCool) >= 1) Then
+				SetMode = 1
+			End If
         End If
 
-        ' ==========================================================================
+        ' ======================================================================
         ' Set temperatures
-        ' ==========================================================================
+        ' ======================================================================
         ' Set the Heat Setpoint
         If (hs.DeviceValue(SetPointHeating) <> SetHeat) Then
             MakeTheCapiHappy("(value) F", SetPointHeating, SetHeat)
@@ -241,9 +224,9 @@ Sub Main(parms As Object)
             End If
         End If
 
-        ' ==========================================================================
+        ' ======================================================================
         ' Output
-        ' ==========================================================================
+        ' ======================================================================
         If (SetMode = 0) Then
             hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: Auto, Avg: " & AverageTemperature &")")
         Else
