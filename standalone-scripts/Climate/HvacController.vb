@@ -85,7 +85,7 @@ Sub Main(parms As Object)
     Dim SetMode As Double
 
     ' Current Average Temperature
-    Dim AverageTemperature As Integer = hs.DeviceValue("118")
+	Dim AverageTemperature As Double = hs.DeviceValueEx(118)
 
     ' Current Operating State
     Dim CurrentOperatingState As Integer = hs.DeviceValue("47")

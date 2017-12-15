@@ -36,7 +36,7 @@ Sub Main(Parms As Object)
     ' ==========================================================================
     ' Math
     ' ==========================================================================
-    Dim Average As Integer = Sum / Total
+    Dim Average As Double = Sum / Total
 
     hs.SetDeviceValueByRef(Tracker, Average, True)
 
