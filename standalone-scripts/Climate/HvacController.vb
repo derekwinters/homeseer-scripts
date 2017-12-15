@@ -226,11 +226,11 @@ Sub Main(parms As Object)
 
         ' ======================================================================
         ' Output
-        ' ======================================================================
+        ' ====================================================================== 43
         If (SetMode = 0) Then
-            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: Auto, Avg: " & AverageTemperature &")")
+            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: Auto | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
         Else
-            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & ", Heat: " & SetHeat & ", Fan: On, Avg: " & AverageTemperature &")")
+            hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: On | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
         End If
     Else
         hs.WriteLog("HVAC Automation", "Thermostat HOLD is enabled. No changes made.")
