@@ -4,24 +4,27 @@
 Sub Main(Parm As Object)
 
 	Dim Message As String = ""
-	Dim SecurityStatus As Integer = hs.DeviceValue(92)
+	Dim SecurityStatus As Integer = hs.DeviceValue(28)
+	Dim SecurityAlert As Integer = hs.DeviceValue(92)
 	
 	' ==========================================================================
 	' Security Status
 	' ==========================================================================
 	Message = "Security System Status<br />"
+	'Message = Message & "Security System Status<br />"
+	'Message = Message & "<br />"
 	If ( SecurityStatus = 0 ) Then
-		Message = Message & "Security State: Disarmed<br />"
+		Message = Message & "State: Disarmed<br />"
 	ElseIf ( SecurityStatus = 50 ) Then
-		Message = Message & "Security State: Perimeter<br />"
+		Message = Message & "State: Perimeter<br />"
 	Else
-		Message = Message & "Security State: Armed<br />"
+		Message = Message & "State: Armed<br />"
 	End If
 	
-	If ( hs.DeviceValue(28) = 100 ) Then
-		Message = Message & "Security Alert: Active<br />"
+	If ( SecurityAlert = 100 ) Then
+		Message = Message & "Alert: Active<br />"
 	Else
-		Message = Message & "Security Alert: Inactive<br />"
+		Message = Message & "Alert: Inactive<br />"
 	End If
 	
 	' ==========================================================================
@@ -29,19 +32,53 @@ Sub Main(Parm As Object)
 	' ==========================================================================
 	Message = Message & "<br />Environment Status<br />"
 	
-	Message = Message & "Avg. Temperature: " & hs.DeviceValue(118) & "<br />"
+	Message = Message & "Avg. Temp: " & hs.DeviceValue(118) & "<br />"
 	
 	If ( hs.DeviceValue(47) = 0 ) Then
-		Message = Message & "Current State: Idle<br />"
+		Message = Message & "State: Idle<br />"
 	Else If ( hs.DeviceValue(47) = 1 ) Then
-		Message = Message & "Current State: Heating<br />"
+		Message = Message & "State: Heating<br />"
 	Else
-		Message = Message & "Current State: Cooling<br />"
+		Message = Message & "State: Cooling<br />"
 	End If
 	
-	Message = Message & "Cool Set Point: " & hs.DeviceValue(49) & "<br />"
+	Message = Message & "Cool Set: " & hs.DeviceValue(49) & "<br />"
 	
-	Message = Message & "Cool Set Point: " & hs.DeviceValue(48) & "<br />"
+	Message = Message & "Heat Set: " & hs.DeviceValue(48) & "<br />"
+	
+	' ==========================================================================
+	' Occupancy
+	' ==========================================================================
+	Message = Message & "<br />Occupancy Status<br />"
+	
+	Select Case hs.DeviceValue(75)
+		Case 0
+			Message = Message & "Occupancy: Vacation<br />"
+		Case 25
+			Message = Message & "Occupancy: Away<br />"
+		Case 75
+			Message = Message & "Occupancy: Occupied<br />"
+		Case 100
+			Message = Message & "Occupancy: Full<br />"
+	End Select
+	
+	Dim People() As Integer = {22,24,25}
+	Dim Value As String
+	
+	For Each Person As Integer In People
+	
+		Select Case hs.DeviceValue(Person)
+			Case 0
+				Value = "Vacation"
+			Case 50
+				Value = "Away"
+			Case 100
+				Value = "Home"
+		End Select
+		
+		Message = Message & hs.DeviceName(Person).Replace("Trackers People",String.Empty) & ": " & Value & "<br />"
+		
+	Next
 	
 	' Send Message
 	SendMessage("System Status",Message)
