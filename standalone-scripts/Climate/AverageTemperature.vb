@@ -6,7 +6,7 @@ Sub Main(Parms As Object)
     Dim Device As Scheduler.Classes.DeviceClass
     Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
     ' Math
-    Dim Sum As Integer
+    Dim Sum As Double
     Dim Total As Integer
     ' Trackers
     Dim Tracker As String = "118"
@@ -26,8 +26,8 @@ Sub Main(Parms As Object)
         End If
 
         If (Device.Device_Type_String(hs) = "Z-Wave Temperature") Then
-            hs.WriteLog("HVAC Automation", "Found a temperature device (ReferenceID: " & Device.ref(hs) & ", Value: " & hs.DeviceValue(Device.ref(hs)) & ")")
-            Sum = Sum + hs.DeviceValue(Device.ref(hs))
+            hs.WriteLog("HVAC Automation", "Found a temperature device (ReferenceID: " & Device.ref(hs) & ", Value: " & hs.DeviceValueEx(Device.ref(hs)) & ")")
+            Sum = Sum + hs.DeviceValueEx(Device.ref(hs))
             Total = Total + 1
         End If
 
