@@ -175,24 +175,24 @@ Sub Main(parms As Object)
 		' adjusted based on the AverageTemperature.
         If (CurrentOperatingState = 0) Then
 			' Adjust Heating
-			If (Math.Abs(AverageTemperature - SetHeat) >= 2) Then
+			If (Math.Abs(AverageTemperature - SetHeat) >= 3) Then
 				If (AverageTemperature > SetHeat) Then
 					SetHeat = SetHeat - 2
 				Else
 					SetHeat = SetHeat + 2
 				End If
-			ElseIf (Math.Abs(AverageTemperature - SetHeat) >= 1) Then
+			Else If (Math.Abs(AverageTemperature - SetHeat) >= 2) Then
 				SetMode = 1
 			End If
 		
 			' Adjust Cooling
-			If (Math.Abs(AverageTemperature - SetCool) >= 2) Then
+			If (Math.Abs(AverageTemperature - SetCool) >= 3) Then
 				If (AverageTemperature > SetCool) Then
 					SetCool = SetCool - 2
 				Else
 					SetCool = SetCool + 2
 				End If
-			ElseIf (Math.Abs(AverageTemperature - SetCool) >= 1) Then
+			Else If (Math.Abs(AverageTemperature - SetCool) >= 2) Then
 				SetMode = 1
 			End If
         End If
