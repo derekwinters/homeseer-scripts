@@ -37,8 +37,13 @@ Sub Main(Parms As Object)
     ' Math
     ' ==========================================================================
     Dim Average As Double = Sum / Total
-
+	
+	'Log the calculated average before rounding and setting the value
+	hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F")
+	
+	Average = Math.Round(Average,1,MidpointRounding.AwayFromZero)
+	
     hs.SetDeviceValueByRef(Tracker, Average, True)
 
-    hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F")
+    
 End Sub
