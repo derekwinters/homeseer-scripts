@@ -26,7 +26,7 @@ Sub Main(Parms As Object)
         End If
 
         If (Device.Device_Type_String(hs) = "Z-Wave Temperature") Then
-            hs.WriteLog("HVAC Automation", "Found a temperature device (ReferenceID: " & Device.ref(hs) & ", Value: " & hs.DeviceValueEx(Device.ref(hs)) & ")")
+            hs.WriteLog("HVAC Automation", "Found a temperature device (Name: " & hs.DeviceName(Device.ref(hs)) & ", Value: " & hs.DeviceValueEx(Device.ref(hs)) & ")")
             Sum = Sum + hs.DeviceValueEx(Device.ref(hs))
             Total = Total + 1
         End If
