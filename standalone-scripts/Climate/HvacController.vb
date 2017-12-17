@@ -174,25 +174,29 @@ Sub Main(parms As Object)
 		' If the system is not active, check if the set points should be
 		' adjusted based on the AverageTemperature.
         If (CurrentOperatingState = 0) Then
+			'
+			Dim HeatDifference As Double = Math.Abs(AverageTemperature - SetHeat )
+			Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool )
+		
 			' Adjust Heating
-			If (Math.Abs(AverageTemperature - SetHeat) >= 3) Then
+			If (HeatDifference >= 3) Then
 				If (AverageTemperature > SetHeat) Then
 					SetHeat = SetHeat - 2
 				Else
 					SetHeat = SetHeat + 2
 				End If
-			Else If (Math.Abs(AverageTemperature - SetHeat) >= 2) Then
+			Else If (HeatDifference >= 2) Then
 				SetMode = 1
 			End If
 		
 			' Adjust Cooling
-			If (Math.Abs(AverageTemperature - SetCool) >= 3) Then
+			If (CoolDifference >= 3) Then
 				If (AverageTemperature > SetCool) Then
 					SetCool = SetCool - 2
 				Else
 					SetCool = SetCool + 2
 				End If
-			Else If (Math.Abs(AverageTemperature - SetCool) >= 2) Then
+			Else If (CoolDifference >= 2) Then
 				SetMode = 1
 			End If
         End If
@@ -226,7 +230,7 @@ Sub Main(parms As Object)
 
         ' ======================================================================
         ' Output
-        ' ====================================================================== 43
+        ' ======================================================================
         If (SetMode = 0) Then
             hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: Auto | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
         Else
