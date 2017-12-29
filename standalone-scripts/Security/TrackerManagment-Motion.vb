@@ -3,24 +3,26 @@ Sub Main(Parms as Object)
 	' Variables
 	' ==========================================================================
 	' Monitors
-	Dim MotionBasement As String = "112"
+	Dim Sensors() As Integer = {112,215}
 	
 	' Trackers
 	Dim Tracker        As String = "117"
 	
 	' ==========================================================================
-	' Check Doors
+	' Check Sensors
 	' ==========================================================================
-	' Check basement motion sensor
-	If ( hs.DeviceValue(MotionBasement) = 255 ) Then
+	' Set the default to No Motion (0)
+	Dim Value As String = 0
 	
-		hs.SetDeviceValueByRef(Tracker,100,True)
-	
-	Else
+	' Loop through sensors
+	For Each Sensor As Integer In Sensors
+		' If the sensor is On-Open-Motion
+		If ( hs.DeviceValue(Sensor) = 255 ) Then
+			Value = 100
+		End If
+	Next
 
-		hs.SetDeviceValueByRef(Tracker,0,True)
-
-	End If
-
+	' Set the Motion Tracker
+	hs.SetDeviceValueByRef(Tracker,Value,True)
 	
 End Sub
