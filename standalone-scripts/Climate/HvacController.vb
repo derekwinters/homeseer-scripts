@@ -194,7 +194,8 @@ Sub Main(parms As Object)
 				If (AverageTemperature > SetCool) Then
 					SetCool = SetCool - 2
 				Else
-					SetCool = SetCool + 2
+					SetCool = SetCool + 1
+                    SetMode = 1
 				End If
 			Else If (CoolDifference >= 2) Then
 				SetMode = 1
