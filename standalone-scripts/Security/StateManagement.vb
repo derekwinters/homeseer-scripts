@@ -18,8 +18,8 @@ Sub Main(parms As Object)
 	Dim CurrentTime           As Integer = Hour(Now())
 	' Security System
 	Dim SecurityMode          As String = "28"
-	Dim SecurityDisarmedStart As Integer = 6   ' 6:00 AM
-	Dim SecurityDisarmedEnd   As Integer = 21  ' 9:00 PM
+	Dim SecurityDisarmedStart As Integer = 5   '  5:00 AM
+	Dim SecurityDisarmedEnd   As Integer = 22  ' 10:00 PM
 	Dim SecurityModeArmed     As Integer = 100
 	Dim SecurityModeDisarmed  As Integer = 0
 	Dim SecurityModePerimeter As Integer = 50
@@ -39,6 +39,7 @@ Sub Main(parms As Object)
 		
 		' Clear alert state if intrusion
 		If ( hs.DeviceValue("92") = 100 ) Then
+            hs.WriteLog("Security System", "Disabling Intrusion")
 			hs.SetDeviceValueByRef("92",0,True)
 		End If
 		
