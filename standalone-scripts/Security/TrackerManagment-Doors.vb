@@ -4,6 +4,7 @@ Sub Main(Parms as Object)
 	' ==========================================================================
 	' Door Monitors
 	Dim DoorsGarageDoor1   As String = "72"
+    Dim DoorsGarageDoor2   As String = "294"
     Dim DoorsPatioDoorDown As String = "68"
     Dim DoorsFrontDoor As String = "201"
     ' Window Monitors
@@ -18,6 +19,9 @@ Sub Main(Parms as Object)
     ' ==========================================================================
 
     If (hs.DeviceValue(DoorsGarageDoor1) = 255) Then
+        ' Check Garage Door
+        hs.SetDeviceValueByRef(TrackerDoors, 100, True)
+    ElseIf (hs.DeviceValue(DoorsGarageDoor2) = 255) Then
         ' Check Garage Door
         hs.SetDeviceValueByRef(TrackerDoors, 100, True)
     ElseIf (hs.DeviceValue(DoorsPatioDoorDown) = 255) Then
