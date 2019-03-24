@@ -24,10 +24,13 @@ Sub Main(Parms As Object)
 
         If (Device.Device_Type_String(hs) = "Z-Wave Battery") Then			
 			hs.WriteLog("HVAC Automation", "Found a battery device (Name: " & Device.Location(hs) & " " & Device.Name(hs) & ", ReferenceID: " & Device.ref(hs) & ", Value: " & hs.DeviceValue(Device.ref(hs)) & ")")
-			If (hs.DeviceValue(Device.ref(hs)) < 15 And Device.ref(hs) <> "87" ) Then
+            ' 0-100 are battery percentage values. 101-254 are invalid, and 255 is Battery Low Warning
+			If ( ( hs.DeviceValue(Device.ref(hs)) < 10 Or hs.DeviceValue(Device.ref(hs)) > 100 ) And Device.ref(hs) <> "87" ) Then
 				hs.WriteLog("HVAC Automation", "Alerting on device " & Device.ref(hs))
 				Body = Body & Device.Location(hs) & " " & Device.Name(hs) & ": " & hs.DeviceValue(Device.ref(hs))
 				Total = Total + 1
+            Else
+                hs.WriteLog("HVAC Automation", "Not alerting on device " & Device.ref(hs) & " value: " & hs.DeviceValue(Device.ref(hs)))
 			End If
 			
         End If
@@ -35,7 +38,7 @@ Sub Main(Parms As Object)
     Loop
 
     If (Total > 0) Then
-        SendMessage("Battery Alert",Body)
+        'SendMessage("Battery Alert",Body)
     End If
 
 End Sub
