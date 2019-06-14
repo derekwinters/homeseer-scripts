@@ -130,6 +130,14 @@ Sub Main(parms As Object)
       SetMode = 0
     End If
 
+    ' ======================================================================
+    ' Seasonal Adjustments
+    ' ======================================================================
+    If ( TemperatureHigh > 50 ) Then
+      SetHeat = DesiredWinter - 20
+    Else
+      SetCool = DesiredSummer + 20
+    End If
 
     ' ======================================================================
     ' Average Temperature Alterations
