@@ -54,7 +54,7 @@ Sub Main(Param As Object)
             
             ' Log discovery
 			hs.WriteLog("Maintenance Task", "ReferenceID: " & Device.ref(hs) & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName)
-        
+
             ' ==================================================================
             ' 
             ' ==================================================================
