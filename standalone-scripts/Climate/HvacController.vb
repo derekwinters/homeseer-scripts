@@ -49,6 +49,8 @@ Sub Main(parms As Object)
 
     ' Current Average Temperature
     Dim AverageTemperature As Double = hs.DeviceValueEx(118)
+    Dim AverageUpstairs As Double = hs.DeviceValueEx(324)
+    Dim AverageDownstairs As Double = hs.DeviceValueEx(325)
 
     ' Current Operating State
     Dim CurrentOperatingState As Integer = hs.DeviceValue("47")
@@ -145,8 +147,9 @@ Sub Main(parms As Object)
     ' If the system is not active, check if the set points should be
     ' adjusted based on the AverageTemperature.
     If (CurrentOperatingState = 0) Then
-      Dim HeatDifference As Double = Math.Abs(AverageTemperature - SetHeat )
-      Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool )
+      Dim HeatDifference As Double = Math.Abs(AverageTemperature - SetHeat)
+      Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool)
+      Dim FloorDifference As Double = Math.Abs(AverageDownstairs - AverageUpstairs)
 
       ' Adjust Heating
       If (HeatDifference >= 3) Then
@@ -168,6 +171,11 @@ Sub Main(parms As Object)
           SetMode = 1
         End If
       Else If (CoolDifference >= 2) Then
+        SetMode = 1
+      End If
+
+      ' Adjust for differences in floor
+      If (FloorDifference > 2) Then
         SetMode = 1
       End If
     End If
