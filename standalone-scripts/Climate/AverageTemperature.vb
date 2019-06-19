@@ -65,6 +65,6 @@ Sub Main(Parms As Object)
 	
     hs.SetDeviceValueByRef(Tracker, Average, True)
     hs.SetDeviceValueByRef(Upstairs, AverageUpstairs, True)
-    hs.SetDeviceValueByRed(Downstairs, AverageDownstairs, True)
+    hs.SetDeviceValueByRef(Downstairs, AverageDownstairs, True)
 
 End Sub
