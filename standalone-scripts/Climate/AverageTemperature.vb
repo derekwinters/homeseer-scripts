@@ -61,7 +61,7 @@ Sub Main(Parms As Object)
 	
     Average = Math.Round(Average,1,MidpointRounding.AwayFromZero)
     AverageDownstairs = Math.Round(AverageDownstairs,1,MidpointRounding.AwayFromZero)
-    AverageUpstrairs = Math.Round(AverageUpstairs,1,MidpointRounding.AwayFromZero)
+    AverageUpstairs = Math.Round(AverageUpstairs,1,MidpointRounding.AwayFromZero)
 	
     hs.SetDeviceValueByRef(Tracker, Average, True)
     hs.SetDeviceValueByRef(Upstairs, AverageUpstairs, True)
