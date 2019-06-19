@@ -67,8 +67,8 @@ Sub Main(parms As Object)
     ' ==========================================================================
     ' Initialize the desired temperature
     ' ==========================================================================
-    Dim DesiredWinter = 72
-    Dim DesiredSummer = 73
+    Dim DesiredWinter = 70
+    Dim DesiredSummer = 75
 
     ' ==========================================================================
     ' Adjust the desired temperature for extreme temperatures
