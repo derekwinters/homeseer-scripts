@@ -158,7 +158,7 @@ Sub Main(parms As Object)
         Else
           SetHeat = SetHeat + 2
         End If
-      Else If (HeatDifference >= 2) Then
+      Else If (HeatDifference >= 2 And OccupancyMode <> 0) Then
         SetMode = 1
       End If
 
@@ -170,12 +170,12 @@ Sub Main(parms As Object)
           SetCool = SetCool + 1
           SetMode = 1
         End If
-      Else If (CoolDifference >= 2) Then
+      Else If (CoolDifference >= 2 And OccupancyMode <> 0) Then
         SetMode = 1
       End If
 
       ' Adjust for differences in floor
-      If (FloorDifference > 2) Then
+      If (FloorDifference > 2 And OccupancyMode <> 0) Then
         SetMode = 1
       End If
     End If
