@@ -5,11 +5,19 @@ Sub Main(Parms As Object)
     ' Find sensors that are "Z-Wave Temperature" and count the total
     Dim Device As Scheduler.Classes.DeviceClass
     Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
+
     ' Math
     Dim Sum As Double
     Dim Total As Integer
+    Dim SumDownstairs As Double
+    Dim SumUpstairs As Double
+    Dim TotalDownstairs As Integer
+    Dim TotalUpstairs As Integer
+
     ' Trackers
     Dim Tracker As String = "118"
+    Dim Upstairs As String = "324"
+    Dim Downstairs As String = "325"
 
     Enumerator = hs.GetDeviceEnumerator
 
@@ -29,6 +37,14 @@ Sub Main(Parms As Object)
             hs.WriteLog("HVAC Automation", "Found a temperature device (Name: " & hs.DeviceName(Device.ref(hs)) & ", Value: " & hs.DeviceValueEx(Device.ref(hs)) & ")")
             Sum = Sum + hs.DeviceValueEx(Device.ref(hs))
             Total = Total + 1
+
+            If ( hs.DeviceName(Device.ref(hs)).StartsWith("Upstairs") ) Then
+              SumUpstairs = SumUpstairs + hs.DeviceValueEx(Device.ref(hs))
+              TotalUpstairs = TotalUpstairs + 1
+            ElseIf ( hs.DeviceName(Device.ref(hs)).StartsWith("Downstairs") ) Then
+              SumDownstairs = SumDownstairs + hs.DeviceValueEx(Device.ref(hs))
+              TotalDownstairs = TotalDownstairs + 1
+            End If
         End If
 
     Loop
@@ -37,13 +53,18 @@ Sub Main(Parms As Object)
     ' Math
     ' ==========================================================================
     Dim Average As Double = Sum / Total
+    Dim AverageDownstairs As Double = SumDownstairs / TotalDownstairs
+    Dim AverageUpstairs As Double = SumUpstairs / TotalUpstairs
 	
-	'Log the calculated average before rounding and setting the value
-	hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F")
+    'Log the calculated average before rounding and setting the value
+    hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F, Downstairs " & AverageDownstairs & " F, Upstairs " & AverageUpstairs & " F"  )
 	
-	Average = Math.Round(Average,1,MidpointRounding.AwayFromZero)
+    Average = Math.Round(Average,1,MidpointRounding.AwayFromZero)
+    AverageDownstairs = Math.Round(AverageDownstairs,1,MidpointRounding,AwayFromZero)
+    AverageUpstrairs = Math.Round(AverageUpstairs,1,MidpointRounding,AwayFromZero)
 	
     hs.SetDeviceValueByRef(Tracker, Average, True)
+    hs.SetDeviceValueByRef(Upstairs, UpstairsAverage, True)
+    hs.SetDeviceValueByRed(Downstairs, DownstairsAverage, True)
 
-    
 End Sub
