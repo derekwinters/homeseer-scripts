@@ -60,8 +60,8 @@ Sub Main(Parms As Object)
     hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F, Downstairs " & AverageDownstairs & " F, Upstairs " & AverageUpstairs & " F"  )
 	
     Average = Math.Round(Average,1,MidpointRounding.AwayFromZero)
-    AverageDownstairs = Math.Round(AverageDownstairs,1,MidpointRounding,AwayFromZero)
-    AverageUpstrairs = Math.Round(AverageUpstairs,1,MidpointRounding,AwayFromZero)
+    AverageDownstairs = Math.Round(AverageDownstairs,1,MidpointRounding.AwayFromZero)
+    AverageUpstrairs = Math.Round(AverageUpstairs,1,MidpointRounding.AwayFromZero)
 	
     hs.SetDeviceValueByRef(Tracker, Average, True)
     hs.SetDeviceValueByRef(Upstairs, AverageUpstairs, True)
