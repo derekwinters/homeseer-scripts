@@ -96,7 +96,7 @@ Sub Main(parms As Object)
         SetHeat = DesiredWinter - 2
         SetCool = DesiredSummer - 2
         SetMode = 0
-      ElseIf (CurrentHour >= 5 and CurrentHour > 9) Then
+      ElseIf (CurrentHour >= 5 and CurrentHour < 9) Then
         ' 5AM - 9AM
         SetHeat = DesiredWinter + 2
         SetCool = DesiredSummer - 1
