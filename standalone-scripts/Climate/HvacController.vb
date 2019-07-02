@@ -185,7 +185,9 @@ Sub Main(parms As Object)
     ' ======================================================================
     If ( SetHeat < 55 ) Then
       SetHeat = 55
-    Else If ( SetCool > 80 ) Then
+    End If
+
+    If ( SetCool > 80 ) Then
       SetCool = 80
     End If
 
