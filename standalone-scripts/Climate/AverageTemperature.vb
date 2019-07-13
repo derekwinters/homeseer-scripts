@@ -51,7 +51,7 @@ Sub Main(Parms As Object)
 
             If (hs.DeviceName(Device.ref(hs)).Contains("Bedroom")) Then
               SumBedrooms = SumBedrooms + hs.DeviceValueEx(Device.ref(hs))
-              TotalBedrooms = TotalBedrooms + hs.DeviceValueEx(Device.ref(hs))
+              TotalBedrooms = TotalBedrooms + 1
             End If
         End If
 
