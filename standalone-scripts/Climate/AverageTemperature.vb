@@ -13,11 +13,14 @@ Sub Main(Parms As Object)
     Dim SumUpstairs As Double
     Dim TotalDownstairs As Integer
     Dim TotalUpstairs As Integer
+    Dim SumBedrooms As Double
+    Dim TotalBedrooms As Double
 
     ' Trackers
     Dim Tracker As String = "118"
     Dim Upstairs As String = "324"
     Dim Downstairs As String = "325"
+    Dim Bedrooms As String = "351"
 
     Enumerator = hs.GetDeviceEnumerator
 
@@ -45,6 +48,11 @@ Sub Main(Parms As Object)
               SumDownstairs = SumDownstairs + hs.DeviceValueEx(Device.ref(hs))
               TotalDownstairs = TotalDownstairs + 1
             End If
+
+            If (hs.DeviceName(Device.ref(hs)).Contains("Bedroom")) Then
+              SumBedrooms = SumBedrooms + hs.DeviceValueEx(Device.ref(hs))
+              TotalBedrooms = TotalBedrooms + hs.DeviceValueEx(Device.ref(hs))
+            End If
         End If
 
     Loop
@@ -55,16 +63,19 @@ Sub Main(Parms As Object)
     Dim Average As Double = Sum / Total
     Dim AverageDownstairs As Double = SumDownstairs / TotalDownstairs
     Dim AverageUpstairs As Double = SumUpstairs / TotalUpstairs
+    Dim AverageBedrooms As Double = SumBedrooms / TotalBedrooms
 	
     'Log the calculated average before rounding and setting the value
-    hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F, Downstairs " & AverageDownstairs & " F, Upstairs " & AverageUpstairs & " F"  )
+    hs.WriteLog("HVAC Automation", "Average home temperature is " & Average & " F, Downstairs " & AverageDownstairs & " F, Upstairs " & AverageUpstairs & " F, Bedrooms " & AverageBedrooms & " F" )
 	
     Average = Math.Round(Average,1,MidpointRounding.AwayFromZero)
     AverageDownstairs = Math.Round(AverageDownstairs,1,MidpointRounding.AwayFromZero)
     AverageUpstairs = Math.Round(AverageUpstairs,1,MidpointRounding.AwayFromZero)
+    AverageBedrooms = Math.Round(AverageBedrooms,1,MidpointRounding.AwayFromZery)
 	
     hs.SetDeviceValueByRef(Tracker, Average, True)
     hs.SetDeviceValueByRef(Upstairs, AverageUpstairs, True)
     hs.SetDeviceValueByRef(Downstairs, AverageDownstairs, True)
+    hs.SetDeviceValueByRef(Bedrooms, AverageBedrooms, True)
 
 End Sub
