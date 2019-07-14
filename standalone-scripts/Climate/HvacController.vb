@@ -133,15 +133,6 @@ Sub Main(parms As Object)
     End If
 
     ' ======================================================================
-    ' Seasonal Adjustments
-    ' ======================================================================
-    If ( TemperatureHigh > 50 ) Then
-      SetHeat = DesiredWinter - 20
-    Else
-      SetCool = DesiredSummer + 20
-    End If
-
-    ' ======================================================================
     ' Average Temperature Alterations
     ' ======================================================================
     ' If the system is not active, check if the set points should be
@@ -178,6 +169,15 @@ Sub Main(parms As Object)
       If (FloorDifference > 2 And OccupancyMode <> 0) Then
         SetMode = 1
       End If
+    End If
+
+    ' ======================================================================
+    ' Seasonal Adjustments
+    ' ======================================================================
+    If ( TemperatureHigh > 50 ) Then
+      SetHeat = SetHeat - 20
+    Else
+      SetCool = SetCool + 20
     End If
 
     ' ======================================================================
