@@ -51,12 +51,16 @@ Sub Main(parms As Object)
     Dim AverageTemperature As Double = hs.DeviceValueEx(118)
     Dim AverageUpstairs As Double = hs.DeviceValueEx(324)
     Dim AverageDownstairs As Double = hs.DeviceValueEx(325)
+    Dim AverageBedroom As Double = hs.DeviceValueEx(351)
 
     ' Current Operating State
     Dim CurrentOperatingState As Integer = hs.DeviceValue("47")
 
     ' Current Operating Mode
     Dim CurrentOperatingMode As Integer = hs.DeviceValue("46")
+
+    ' Current thermostat Temperature Reading
+    Dim CurrentThermostatReading As Integer = hs.DeviceValue("43")
 
     ' ==========================================================================
     ' If Heading Home is enabled, mock Occupancy
@@ -132,9 +136,9 @@ Sub Main(parms As Object)
       SetMode = 0
     End If
 
-    ' ======================================================================
+    ' ==========================================================================
     ' Average Temperature Alterations
-    ' ======================================================================
+    ' ==========================================================================
     ' If the system is not active, check if the set points should be
     ' adjusted based on the AverageTemperature.
     If (CurrentOperatingState = 0) Then
@@ -171,18 +175,35 @@ Sub Main(parms As Object)
       End If
     End If
 
-    ' ======================================================================
+    ' ==========================================================================
+    ' Night Time Override
+    ' ==========================================================================
+    ' If it's night time, make sure the bedrooms haven't becoming dramatically
+    ' warmer or colder than what the desired temperature is for that season. If
+    ' they are, set the thermostat to whatever it currently sees as the local
+    ' temperature to prevent the system from running.
+    If (CurrentHour > 9 or CurrentHour < 6) Then
+      If ((Temperature > 50) and (AverageBedroom < DesiredSummer)) Then
+        ' It's summer and the bedrooms are colder than the desired temperature
+        SetCool = CurrentThermostatReading
+      Else If ((Temperature <= 50) and (AverageBedroom > DesiredWinter)) Then
+        ' It's winter and the bedrooms are warmer than the desired temperature
+        SetHeat = CurrentThermostatReading
+      End If
+    End If
+
+    ' ==========================================================================
     ' Seasonal Adjustments
-    ' ======================================================================
+    ' ==========================================================================
     If ( TemperatureHigh > 50 ) Then
       SetHeat = SetHeat - 20
     Else
       SetCool = SetCool + 20
     End If
 
-    ' ======================================================================
+    ' ==========================================================================
     ' Sanity Check
-    ' ======================================================================
+    ' ==========================================================================
     If ( SetHeat < 55 ) Then
       SetHeat = 55
     End If
@@ -191,9 +212,9 @@ Sub Main(parms As Object)
       SetCool = 80
     End If
 
-    ' ======================================================================
+    ' ==========================================================================
     ' Set temperatures
-    ' ======================================================================
+    ' ==========================================================================
     ' Set the Heat Setpoint
     If (hs.DeviceValue(SetPointHeating) <> SetHeat) Then
       MakeTheCapiHappy("(value) F", SetPointHeating, SetHeat)
@@ -218,9 +239,9 @@ Sub Main(parms As Object)
       End If
     End If
 
-    ' ======================================================================
+    ' ==========================================================================
     ' Output
-    ' ======================================================================
+    ' ==========================================================================
     If (SetMode = 0) Then
       hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: Auto | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
     Else
