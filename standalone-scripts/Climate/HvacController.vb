@@ -127,12 +127,12 @@ Sub Main(parms As Object)
     Else If ( OccupancyMode = 0 ) Then
       ' Vacation
       SetHeat = DesiredWinter - 20
-      SetCool = DesiredSummer + 8
+      SetCool = DesiredSummer + 5
       SetMode = 0
     Else
       ' Away
       SetHeat = DesiredWinter - 8
-      SetCool = DesiredSummer + 3
+      SetCool = DesiredSummer + 1
       SetMode = 0
     End If
 
