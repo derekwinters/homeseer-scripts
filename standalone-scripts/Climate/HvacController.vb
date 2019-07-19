@@ -131,12 +131,12 @@ Sub Main(parms As Object)
     Else If ( OccupancyMode = 0 ) Then
       ' Vacation
       SetHeat = DesiredWinter - 20
-      SetCool = DesiredSummer + 8
+      SetCool = DesiredSummer + 5
       SetMode = 0
     Else
       ' Away
       SetHeat = DesiredWinter - 8
-      SetCool = DesiredSummer + 3
+      SetCool = DesiredSummer + 1
       SetMode = 0
     End If
 
@@ -191,11 +191,11 @@ Sub Main(parms As Object)
     ' they are, set the thermostat to whatever it currently sees as the local
     ' temperature to prevent the system from running.
     If (CurrentHour > 9 or CurrentHour < 6) Then
-      If ((TemperatureHigh > 50) and (AverageBedroom < DesiredSummer)) Then
+      If ((TemperatureHigh > 50) and (AverageBedroom < SetCool)) Then
         ' It's summer and the bedrooms are colder than the desired temperature
         SetCool = CurrentThermostatReading
         hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
-      Else If ((TemperatureHigh <= 50) and (AverageBedroom > DesiredWinter)) Then
+      Else If ((TemperatureHigh <= 50) and (AverageBedroom > SetHeat)) Then
         ' It's winter and the bedrooms are warmer than the desired temperature
         SetHeat = CurrentThermostatReading
         hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
