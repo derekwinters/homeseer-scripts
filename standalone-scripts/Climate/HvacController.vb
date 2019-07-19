@@ -82,12 +82,16 @@ Sub Main(parms As Object)
     ' Modify the set points based on the outside temperature
     If (OutsideTemperature > 100) Then
       DesiredSummer = DesiredSummer + 2
+      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
     ElseIf (OutsideTemperature > 80) Then
       DesiredSummer = DesiredSummer + 1
+      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
     ElseIf (OutsideTemperature < 0) Then
       DesiredWinter = DesiredWinter - 2
+      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
     ElseIf (OutsideTemperature < 10) Then
       DesiredWinter = DesiredWinter - 1
+      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
     End If
 
     ' ==========================================================================
@@ -150,8 +154,10 @@ Sub Main(parms As Object)
       If (HeatDifference >= 3) Then
         If (AverageTemperature > SetHeat) Then
           SetHeat = SetHeat - 2
+          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
         Else
           SetHeat = SetHeat + 2
+          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
         End If
       Else If (HeatDifference >= 2 And OccupancyMode <> 0) Then
         SetMode = 1
@@ -161,8 +167,10 @@ Sub Main(parms As Object)
       If (CoolDifference >= 3) Then
         If (AverageTemperature > SetCool) Then
           SetCool = SetCool - 2
+          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
         Else
           SetCool = SetCool + 1
+          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
           SetMode = 1
         End If
       Else If (CoolDifference >= 2 And OccupancyMode <> 0) Then
@@ -186,9 +194,11 @@ Sub Main(parms As Object)
       If ((TemperatureHigh > 50) and (AverageBedroom < DesiredSummer)) Then
         ' It's summer and the bedrooms are colder than the desired temperature
         SetCool = CurrentThermostatReading
+        hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
       Else If ((TemperatureHigh <= 50) and (AverageBedroom > DesiredWinter)) Then
         ' It's winter and the bedrooms are warmer than the desired temperature
         SetHeat = CurrentThermostatReading
+        hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
       End If
     End If
 
