@@ -128,6 +128,69 @@ Sub Main(parms As Object)
         SetHeat = SetHeat - 1
       End If
 
+
+      ' ========================================================================
+      ' Average Temperature Alterations
+      ' ========================================================================
+      ' If the system is not active, check if the set points should be
+      ' adjusted based on the AverageTemperature.
+      If (CurrentOperatingState = 0) Then
+        Dim HeatDifference As Double = Math.Abs(AverageTemperature - SetHeat)
+        Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool)
+        Dim FloorDifference As Double = Math.Abs(AverageDownstairs - AverageUpstairs)
+
+        ' Adjust Heating
+        If (HeatDifference >= 3) Then
+          If (AverageTemperature > SetHeat) Then
+            SetHeat = SetHeat - 2
+            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
+          Else
+            SetHeat = SetHeat + 2
+            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
+          End If
+        Else If (HeatDifference >= 2 And OccupancyMode <> 0) Then
+          SetMode = 1
+        End If
+
+        ' Adjust Cooling
+        If (CoolDifference >= 3) Then
+          If (AverageTemperature > SetCool) Then
+            SetCool = SetCool - 2
+            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
+          Else
+            SetCool = SetCool + 1
+            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
+            SetMode = 1
+          End If
+        Else If (CoolDifference >= 2 And OccupancyMode <> 0) Then
+          SetMode = 1
+        End If
+
+        ' Adjust for differences in floor
+        If (FloorDifference > 2 And OccupancyMode <> 0) Then
+          SetMode = 1
+        End If
+      End If
+
+      ' ========================================================================
+      ' Night Time Override
+      ' ========================================================================
+      ' If it's night time, make sure the bedrooms haven't becoming dramatically
+      ' warmer or colder than what the desired temperature is for that season. If
+      ' they are, set the thermostat to whatever it currently sees as the local
+      ' temperature to prevent the system from running.
+      If (CurrentHour > 21 or CurrentHour < 6) Then
+        If ((TemperatureHigh > 50) and (AverageBedroom < SetCool)) Then
+          ' It's summer and the bedrooms are colder than the desired temperature
+          SetCool = CurrentThermostatReading
+          hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
+        Else If ((TemperatureHigh <= 50) and (AverageBedroom > SetHeat)) Then
+          ' It's winter and the bedrooms are warmer than the desired temperature
+          SetHeat = CurrentThermostatReading
+          hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
+        End If
+      End If
+
     Else If ( OccupancyMode = 0 ) Then
       ' Vacation
       SetHeat = DesiredWinter - 20
@@ -141,68 +204,6 @@ Sub Main(parms As Object)
     End If
 
     ' ==========================================================================
-    ' Average Temperature Alterations
-    ' ==========================================================================
-    ' If the system is not active, check if the set points should be
-    ' adjusted based on the AverageTemperature.
-    If (CurrentOperatingState = 0) Then
-      Dim HeatDifference As Double = Math.Abs(AverageTemperature - SetHeat)
-      Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool)
-      Dim FloorDifference As Double = Math.Abs(AverageDownstairs - AverageUpstairs)
-
-      ' Adjust Heating
-      If (HeatDifference >= 3) Then
-        If (AverageTemperature > SetHeat) Then
-          SetHeat = SetHeat - 2
-          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-        Else
-          SetHeat = SetHeat + 2
-          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-        End If
-      Else If (HeatDifference >= 2 And OccupancyMode <> 0) Then
-        SetMode = 1
-      End If
-
-      ' Adjust Cooling
-      If (CoolDifference >= 3) Then
-        If (AverageTemperature > SetCool) Then
-          SetCool = SetCool - 2
-          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-        Else
-          SetCool = SetCool + 1
-          hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-          SetMode = 1
-        End If
-      Else If (CoolDifference >= 2 And OccupancyMode <> 0) Then
-        SetMode = 1
-      End If
-
-      ' Adjust for differences in floor
-      If (FloorDifference > 2 And OccupancyMode <> 0) Then
-        SetMode = 1
-      End If
-    End If
-
-    ' ==========================================================================
-    ' Night Time Override
-    ' ==========================================================================
-    ' If it's night time, make sure the bedrooms haven't becoming dramatically
-    ' warmer or colder than what the desired temperature is for that season. If
-    ' they are, set the thermostat to whatever it currently sees as the local
-    ' temperature to prevent the system from running.
-    If (CurrentHour > 21 or CurrentHour < 6) Then
-      If ((TemperatureHigh > 50) and (AverageBedroom < SetCool)) Then
-        ' It's summer and the bedrooms are colder than the desired temperature
-        SetCool = CurrentThermostatReading
-        hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
-      Else If ((TemperatureHigh <= 50) and (AverageBedroom > SetHeat)) Then
-        ' It's winter and the bedrooms are warmer than the desired temperature
-        SetHeat = CurrentThermostatReading
-        hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
-      End If
-    End If
-
-    ' ==========================================================================
     ' Seasonal Adjustments
     ' ==========================================================================
     If ( TemperatureHigh > 50 ) Then
@@ -210,6 +211,7 @@ Sub Main(parms As Object)
     Else
       SetCool = SetCool + 20
     End If
+
 
     ' ==========================================================================
     ' Sanity Check
