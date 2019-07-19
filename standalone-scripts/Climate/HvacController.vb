@@ -190,7 +190,7 @@ Sub Main(parms As Object)
     ' warmer or colder than what the desired temperature is for that season. If
     ' they are, set the thermostat to whatever it currently sees as the local
     ' temperature to prevent the system from running.
-    If (CurrentHour > 9 or CurrentHour < 6) Then
+    If (CurrentHour > 21 or CurrentHour < 6) Then
       If ((TemperatureHigh > 50) and (AverageBedroom < SetCool)) Then
         ' It's summer and the bedrooms are colder than the desired temperature
         SetCool = CurrentThermostatReading
