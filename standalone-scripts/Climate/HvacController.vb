@@ -80,10 +80,10 @@ Sub Main(parms As Object)
     ' Adjust the desired temperature for extreme temperatures
     ' ==========================================================================
     ' Modify the set points based on the outside temperature
-    If (OutsideTemperature > 100) Then
+    If (OutsideTemperature > 105) Then
       DesiredSummer = DesiredSummer + 2
       hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
-    ElseIf (OutsideTemperature > 80) Then
+    ElseIf (OutsideTemperature > 85) Then
       DesiredSummer = DesiredSummer + 1
       hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
     ElseIf (OutsideTemperature < 0) Then
@@ -194,7 +194,7 @@ Sub Main(parms As Object)
     Else If ( OccupancyMode = 0 ) Then
       ' Vacation
       SetHeat = DesiredWinter - 20
-      SetCool = DesiredSummer + 5
+      SetCool = DesiredSummer + 4
       SetMode = 0
     Else
       ' Away
