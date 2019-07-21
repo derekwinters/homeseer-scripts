@@ -17,11 +17,11 @@ Sub Main(Parms as Object)
 
   ' First, determine how long vacation mode has been active. This function
   ' returns the number of minutes since a device was last changed.
-  Dim TimeInVacation = hs.DeviceTime(hs.DeviceValueByRef(OccupancyMode))
+  Dim TimeInVacation = hs.DeviceTime(hs.DeviceValue(OccupancyMode))
   hs.WriteLog("Occupancy", "Time in vacation mode: " & TimeInVacation)
 
   ' Get vacation duration
-  Dim VacationDurationDays = hs.DeviceValueByRef(VacationDuration)
+  Dim VacationDurationDays = hs.DeviceValue(VacationDuration)
   hs.WriteLog("Occupancy", "Vacation duration: " & VacationDurationDays)
 
   ' To make sure the that this triggers on the morning of returning home,
