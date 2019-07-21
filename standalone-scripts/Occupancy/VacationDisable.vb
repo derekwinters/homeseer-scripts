@@ -17,7 +17,7 @@ Sub Main(Parms as Object)
 
   ' First, determine how long vacation mode has been active. This function
   ' returns the number of minutes since a device was last changed.
-  Dim TimeInVacation = hs.DeviceTime(hs.DeviceByRef(OccupancyMode))
+  Dim TimeInVacation = hs.DeviceTime(hs.DeviceValueByRef(OccupancyMode))
   hs.WriteLog("Occupancy", "Time in vacation mode: " & TimeInVacation)
 
   ' Get vacation duration
