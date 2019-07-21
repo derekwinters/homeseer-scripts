@@ -22,7 +22,7 @@ Sub Main(Parms as Object)
 
   ' Get vacation duration
   Dim VacationDurationDays = hs.DeviceValueByRef(VacationDuration)
-  hs.WriteLog("Occupancy", "Vacation duration: " & VacationDurationMinutes)
+  hs.WriteLog("Occupancy", "Vacation duration: " & VacationDurationDays)
 
   ' To make sure the that this triggers on the morning of returning home,
   ' round TimeInVacation to whole days and remove any extra time. Do this
@@ -33,7 +33,7 @@ Sub Main(Parms as Object)
 
   ' Check if duration has been exceeded and change the trackers from
   ' vacation to away
-  If (TimeInVacationDays > VacationDurationDays And VacationDurationdays > 0) Then
+  If (TimeInVacationDays > VacationDurationDays And VacationDurationDays > 0) Then
     hs.SetDeviceValueByRef(AmyTrack,25,True)
     hs.SetDeviceValueByRef(DerekTrack,25,True)
   End If
