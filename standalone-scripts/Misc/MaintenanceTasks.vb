@@ -56,8 +56,7 @@ Sub Main(Param As Object)
       TaskType = TaskString(1)
       TaskPeriod = TaskString(2)
       TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
-      IntervalMin = hs.DeviceTime(TaskId)
-      IntervalDays = Math.Round((IntervalMin/1440),0,MidpointRounding.AwayFromZero)
+      TaskAge = Math.Round((hs.DeviceTime(TaskId)/1440),0,MidpointRounding.AwayFromZero)
 
       ' Log discovery
       hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & TaskAge)
