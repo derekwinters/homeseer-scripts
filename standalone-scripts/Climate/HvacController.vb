@@ -82,10 +82,6 @@ Sub Main(parms As Object)
     ' Modify the set points based on the outside temperature and time of day
     Dim ExtremeTemperatureFunctionResult As Integer() = ExtremeTemperatureAdjustments(OutsideTemperature,TemperatureHigh,CurrentHour,DesiredWinter,DesiredSummer)
 
-    ' Save results of function
-    DesiredWinter = ExtremeTemperatureFunctionResult(0)
-    DesiredSummer = ExtremeTemperatureFunctionResult(1)
-
     hs.WriteLog("HvacController", "Desired Winter: " & DesiredWinter & " | Desired Summer: " & DesiredSummer)
 
     ' ==========================================================================
@@ -93,11 +89,6 @@ Sub Main(parms As Object)
     ' ==========================================================================
     If (OccupancyMode = 100 OrElse OccupancyMode = 75 ) Then
       Dim TimeOfDayFunctionResult As Integer() = TimeOfDayAdjustments(CurrentHour,SetHeat,SetCool,SetMode,DesiredWinter,DesiredSummer)
-
-      ' Save results of function
-      SetHeat = TimeOfDayFunctionResult(0)
-      SetCool = TimeOfDayFunctionResult(1)
-      SetMode = TimeOfDayFunctionResult(2)
 
       hs.WriteLog("HvacController", "Time adjusted temperatures (Heat: " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
 
@@ -112,11 +103,6 @@ Sub Main(parms As Object)
         Dim FloorDifference As Double = Math.Abs(AverageDownstairs - AverageUpstairs)
 
         Dim AverageAdjustments(HeatDifference,CoolDifference,FloorDifference,AverageTemperature,SetHeat,SetCool,SetMode)
-
-        ' Save results of function
-        SetHeat = AverageAdjustments(0)
-        SetCool = AverageAdjustments(1)
-        SetMode = AverageAdjustments(2)
 
         hs.WriteLog("HvacController", "Average adjustments (Heat " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
 
@@ -198,7 +184,7 @@ End Sub
 ' 
 ' Adjust the set points for the thermostat based on the time of day.
 ' ==============================================================================
-Sub TimeOfDayAdjustments(CurrentHour As Integer,SetHeat As Integer,SetCool As Integer,SetMode As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
+Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef SetCool As Integer,ByRef SetMode As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
   ' Start by determining desired temperature based on the current time
   If (CurrentHour >= 23 or CurrentHour < 5) Then
     ' 11PM - 5AM
@@ -221,9 +207,6 @@ Sub TimeOfDayAdjustments(CurrentHour As Integer,SetHeat As Integer,SetCool As In
     SetCool = DesiredSummer
     SetMode = 0
   End If
-
-  ' Return array
-  Return {SetHeat,SetCool,SetMode}
 End Sub
 
 ' ==============================================================================
@@ -231,7 +214,7 @@ End Sub
 '
 ' Adjust the desired temperatures based on temperature extremes and time of day
 ' ==============================================================================
-Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh As Integer,CurrentHour As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
+Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh As Integer,CurrentHour As Integer,ByRef DesiredWinter As Integer,ByRef DesiredSummer As Integer)
   If (CurrentHour > 3 And CurrentHour < 9 And TemperatureHigh > 90) Then
     ' In the morning, if the high is over 90, lower the temperature by 1 degree
     ' to cool the house down before it gets warmer to make it easier to maintain
@@ -254,9 +237,6 @@ Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh 
   ElseIf (OutsideTemperature < 10) Then
     DesiredWinter = DesiredWinter - 1
   End If
-
-  ' Return array
-  Return {DesiredWinter,DesiredSummer}
 End Sub
 
 ' ==============================================================================
@@ -265,7 +245,7 @@ End Sub
 ' Adjust the set points if there are dramatic differences between upstairs and
 ' downstairs
 ' ==============================================================================
-Sub AverageAdjustments(HeatDifference As Double,CoolDifference As Double,FloorDifference As Double,AverageTemperature As Integer,SetHeat As Integer,SetCool As Integer,SetMode As Integer)
+Sub AverageAdjustments(HeatDifference As Double,CoolDifference As Double,FloorDifference As Double,AverageTemperature As Integer,ByRef SetHeat As Integer,ByRef SetCool As Integer,ByRef SetMode As Integer)
   ' Adjust Heating
   If (HeatDifference >= 3) Then
     If (AverageTemperature > SetHeat) Then
@@ -293,9 +273,6 @@ Sub AverageAdjustments(HeatDifference As Double,CoolDifference As Double,FloorDi
   If (FloorDifference > 2) Then
     SetMode = 1
   End If
-
-  ' Return array
-  Return {SetHeat,SetCool,SetMode}
 End Sub
 
 ' ==============================================================================
