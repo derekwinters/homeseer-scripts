@@ -36,6 +36,7 @@ Sub Main(Param As Object)
   Dim TaskType As String
   Dim TaskPeriod As String
   Dim TaskName As String
+  Dim TaskId As Integer
   Dim Message As String = ""
   Dim IntervalDays As Integer
 
@@ -47,14 +48,15 @@ Sub Main(Param As Object)
     End If
 
     If (Device.Device_Type_String(hs).StartsWith("MaintenanceTask")) Then
+      TaskId = Device.ref(hs)
       ' Parse DeviceTypeString
       TaskString = Split(Device.Device_Type_String(hs).ToString," ")
       TaskType = TaskString(1)
       TaskPeriod = TaskString(2)
-      TaskName = hs.DeviceName(Device.ref(hs)).Replace("Trackers Maintenance",String.Empty)
+      TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
 
       ' Log discovery
-      hs.WriteLog("Maintenance Task", "ReferenceID: " & Device.ref(hs) & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName)
+      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName)
 
       ' ==================================================================
       ' 
@@ -62,7 +64,7 @@ Sub Main(Param As Object)
       Select Case TaskType
         Case = "DayOfWeek"
           If ( TodayDay = TaskPeriod ) Then
-            Message = "Maintenance Task " & Device.ref(hs) & ": " & TaskName & " is due today."
+            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today."
           End If
         Case = "DayOfMonth"
           If ( TodayNumber = TaskPeriod ) Then
@@ -74,21 +76,21 @@ Sub Main(Param As Object)
           End If
         Case = "Interval"
           ' If the device is off, check for how long
-          If (hs.DeviceValue(Device.ref(hs)) == 0) Then
+          If (hs.DeviceValue(Device.ref(hs)) = 0) Then
             ' Convert minutes to days, rounding down
-            IntervalDays = hs.DeviceTime(hs.DeviceValue(Device.ref(hs))) / 1440
+            IntervalDays = hs.DeviceTime(hs.DeviceValue(TaskId)) / 1440
 
             ' Check the interval against the setting
             If (IntervalDays > TaskPeriod) Then
               ' Turn the device on
-              hs.SetDeviceValueByRef(hs.DeviceValue(Device.ref(hs)),100,True)
+              hs.SetDeviceValueByRef(hs.DeviceValue(TaskId),100,True)
             End If
           End If
 
           ' Check again to see if the device was just turned on
-          If (hs.DeviceValue(Device.ref(hs)) == 100) Then
+          If (hs.DeviceValue(Device.ref(hs)) = 100) Then
             ' The device is on, the task hasn't been completed
-            Message = "Maintenance Task " & Device.ref(hs) & ": " & TaskName & " is due today.<br /><br />Replay 'Task " & Device.ref(hs) & " complete to reset timer."
+            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />Replay 'Task " & TaskId & " complete to reset timer."
           End If
       End Select
 
