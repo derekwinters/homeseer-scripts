@@ -57,7 +57,7 @@ Sub Main(Param As Object)
       TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
 
       ' Log discovery
-      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & hs.DeviceTime(hs.DeviceValue(TaskId))/1440)
+      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & hs.DeviceTime(TaskId)/1440)
 
       ' ==================================================================
       ' 
@@ -79,7 +79,7 @@ Sub Main(Param As Object)
           ' If the device is off, check for how long
           If (hs.DeviceValue(TaskId) = 0) Then
             ' Convert minutes to days, rounding down
-            IntervalMin = hs.DeviceTime(hs.DeviceValue(TaskId))
+            IntervalMin = hs.DeviceTime(TaskId)
             IntervalDays = Math.Round((IntervalMin/1440),0,MidpointRounding.AwayFromZero)
 
             ' Check the interval against the setting
