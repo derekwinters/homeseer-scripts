@@ -79,7 +79,7 @@ Sub Main(Param As Object)
           ' If the device is off, check for how long
           If (hs.DeviceValue(TaskId) = 0) Then
             ' Convert minutes to days, rounding down
-            IntervalMin = hs.DeviceTime(hs.DeviceValue(TaskId)
+            IntervalMin = hs.DeviceTime(hs.DeviceValue(TaskId))
             IntervalDays = Math.Round((IntervalMin/1440),0,MidpointRounding.AwayFromZero)
 
             ' Check the interval against the setting
