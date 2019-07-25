@@ -105,6 +105,7 @@ Sub Main(parms As Object)
         Dim AverageAdjustments(HeatDifference,CoolDifference,FloorDifference,AverageTemperature,SetHeat,SetCool,SetMode)
 
         hs.WriteLog("HvacController", "Average adjustments (Heat " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
+      End If
 
     Else If ( OccupancyMode = 0 ) Then
       ' Vacation
@@ -219,7 +220,7 @@ Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh 
     ' In the morning, if the high is over 90, lower the temperature by 1 degree
     ' to cool the house down before it gets warmer to make it easier to maintain
     ' the desired temperature later.
-      DesiredSummer = DesiredSummer - 1
+    DesiredSummer = DesiredSummer - 1
   ElseIf (CurrentHour > 3 And CurrentHour < 16 And TemperatureHigh > 50) Then
     ' During the day, if the high is above 50, lower the winter temperature by
     ' 1 degree to prevent the house from getting too warm from the sun.
