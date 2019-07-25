@@ -37,6 +37,7 @@ Sub Main(Param As Object)
   Dim TaskPeriod As String
   Dim TaskName As String
   Dim Message As String = ""
+  Dim IntervalDays As Integer
 
   Do While Not Enumerator.Finished
     Device = Enumerator.GetNext
@@ -70,6 +71,24 @@ Sub Main(Param As Object)
         Case = "FirstDayOfMonth"
           If ( TodayDay = TaskPeriod And TodayNumber <= 7 ) Then
             Message = ""
+          End If
+        Case = "Interval"
+          ' If the device is off, check for how long
+          If (hs.DeviceValue(Device.ref(hs)) == 0) Then
+            ' Convert minutes to days, rounding down
+            IntervalDays = DeviceTime(hs.DeviceValue(Device.ref(hs))) / 1440
+
+            ' Check the interval against the setting
+            If (IntervalDays > TaskPeriod) Then
+              ' Turn the device on
+              hs.SetDeviceValueByRef(hs.DeviceValue(Device.ref(hs)),100,True)
+            End If
+          End If
+
+          ' Check again to see if the device was just turned on
+          If (hs.DeviceValue(Device.ref(hs)) == 100) Then
+            ' The device is on, the task hasn't been completed
+            Message = "Maintenance Task " & Device.ref(hs) & ": " & TaskName & " is due today.<br /><br />Replay 'Task " & Device.ref(hs) & " complete to reset timer."
           End If
       End Select
 
