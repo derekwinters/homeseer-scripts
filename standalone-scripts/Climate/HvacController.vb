@@ -80,7 +80,7 @@ Sub Main(parms As Object)
     ' Adjust the desired temperature for extremes
     ' ==========================================================================
     ' Modify the set points based on the outside temperature and time of day
-    Dim ExtremeTemperatureFunctionResult As Integer() = ExtremeTemperatureAdjustments(OutsideTemperature,TemperatureHigh,CurrentHour,DesiredWinter,DesiredSummer)
+    ExtremeTemperatureAdjustments(OutsideTemperature,TemperatureHigh,CurrentHour,DesiredWinter,DesiredSummer)
 
     hs.WriteLog("HvacController", "Desired Winter: " & DesiredWinter & " | Desired Summer: " & DesiredSummer)
 
@@ -88,7 +88,7 @@ Sub Main(parms As Object)
     ' Adjust the desired temperature based on time of day
     ' ==========================================================================
     If (OccupancyMode = 100 OrElse OccupancyMode = 75 ) Then
-      Dim TimeOfDayFunctionResult As Integer() = TimeOfDayAdjustments(CurrentHour,SetHeat,SetCool,SetMode,DesiredWinter,DesiredSummer)
+      TimeOfDayAdjustments(CurrentHour,SetHeat,SetCool,SetMode,DesiredWinter,DesiredSummer)
 
       hs.WriteLog("HvacController", "Time adjusted temperatures (Heat: " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
 
@@ -102,7 +102,7 @@ Sub Main(parms As Object)
         Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool)
         Dim FloorDifference As Double = Math.Abs(AverageDownstairs - AverageUpstairs)
 
-        Dim AverageAdjustments(HeatDifference,CoolDifference,FloorDifference,AverageTemperature,SetHeat,SetCool,SetMode)
+        AverageAdjustments(HeatDifference,CoolDifference,FloorDifference,AverageTemperature,SetHeat,SetCool,SetMode)
 
         hs.WriteLog("HvacController", "Average adjustments (Heat " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
       End If
