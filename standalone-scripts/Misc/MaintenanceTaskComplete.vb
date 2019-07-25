@@ -15,7 +15,11 @@ Sub Main(Param As Object)
   
   hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index))
   
-  hs.SetDeviceValueByRef(TaskId,100,True)
-  Threading.Thread.Sleep(30000)
-  hs.SetDeviceValueByRef(TaskId,0,True)
+  ' Turn off the device if necessary
+  If (hs.DeviceValue(TaskId) <> 0) Then
+    hs.SetDeviceValueByRef(TaskId,0,True)
+  End If
+  
+  ' Set the last change to the time the message was sent
+  hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
 End Sub
