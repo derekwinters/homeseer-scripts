@@ -187,8 +187,8 @@ End Sub
 ' ==============================================================================
 Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef SetCool As Integer,ByRef SetMode As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
   ' Start by determining desired temperature based on the current time
-  If (CurrentHour >= 23 or CurrentHour < 5) Then
-    ' 11PM - 5AM
+  If (CurrentHour >= 21 or CurrentHour < 5) Then
+    ' 9PM - 5AM
     SetHeat = DesiredWinter - 2
     SetCool = DesiredSummer - 2
     SetMode = 0
@@ -203,8 +203,8 @@ Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef S
     SetCool = DesiredSummer
     SetMode = 0
   Else
-    ' 7PM - 11PM
-    SetHeat = DesiredWinter -1
+    ' 7PM - 9PM
+    SetHeat = DesiredWinter -2
     SetCool = DesiredSummer
     SetMode = 0
   End If
