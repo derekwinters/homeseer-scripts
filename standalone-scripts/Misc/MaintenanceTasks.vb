@@ -57,7 +57,7 @@ Sub Main(Param As Object)
       TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
 
       ' Log discovery
-      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName)
+      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & hs.DeviceTime(hs.DeviceValue(TaskId))/1440)
 
       ' ==================================================================
       ' 
