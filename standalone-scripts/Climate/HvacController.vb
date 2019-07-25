@@ -20,7 +20,7 @@
 ' ==============================================================================
 Sub Main(parms As Object)
   If ( hs.DeviceValue("202") <> 0 ) Then
-    hs.WriteLog("HVAC Automation", "Thermostat HOLD is enabled. No changes made.")
+    hs.WriteLog("HvacController", "Thermostat HOLD is enabled. No changes made.")
   Else
     ' ==========================================================================
     ' Set Variables
@@ -66,7 +66,7 @@ Sub Main(parms As Object)
     ' If Heading Home is enabled, mock Occupancy
     ' ==========================================================================
     If ( hs.DeviceValue("211") = 100 ) Then
-      hs.WriteLog("HVAC Automation", "Heading home is enabled. Mocking OccupancyMode to 100")
+      hs.WriteLog("HvacController", "Heading home is enabled. Mocking OccupancyMode to 100")
       OccupancyMode = 100
     End If
 
@@ -77,119 +77,48 @@ Sub Main(parms As Object)
     Dim DesiredSummer = 75
 
     ' ==========================================================================
-    ' Adjust the desired temperature for extreme temperatures
+    ' Adjust the desired temperature for extremes
     ' ==========================================================================
-    ' Modify the set points based on the outside temperature
-    If (OutsideTemperature > 105) Then
-      DesiredSummer = DesiredSummer + 2
-      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
-    ElseIf (OutsideTemperature > 85) Then
-      DesiredSummer = DesiredSummer + 1
-      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
-    ElseIf (OutsideTemperature < 0) Then
-      DesiredWinter = DesiredWinter - 2
-      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
-    ElseIf (OutsideTemperature < 10) Then
-      DesiredWinter = DesiredWinter - 1
-      hs.WriteLog("HVAC Automation Debug", "Adjusting for outside temperature")
-    End If
+    ' Modify the set points based on the outside temperature and time of day
+    Dim ExtremeTemperatureFunctionResult As Integer() = ExtremeTemperatureAdjustments(OutsideTemperature,TemperatureHigh,CurrentHour,DesiredWinter,DesiredSummer)
+
+    ' Save results of function
+    DesiredWinter = ExtremeTemperatureFunctionResult(0)
+    DesiredSummer = ExtremeTemperatureFunctionResult(1)
+
+    hs.WriteLog("HvacController", "Desired Winter: " & DesiredWinter & " | Desired Summer: " & DesiredSummer)
 
     ' ==========================================================================
     ' Adjust the desired temperature based on time of day
     ' ==========================================================================
     If (OccupancyMode = 100 OrElse OccupancyMode = 75 ) Then
-      ' Start by determining desired temperature based on the current time
-      If (CurrentHour >= 23 or CurrentHour < 5) Then
-        ' 11PM - 5AM
-        SetHeat = DesiredWinter - 2
-        SetCool = DesiredSummer - 2
-        SetMode = 0
-      ElseIf (CurrentHour >= 5 and CurrentHour < 9) Then
-        ' 5AM - 9AM
-        SetHeat = DesiredWinter + 2
-        SetCool = DesiredSummer - 1
-        SetMode = 1
-      ElseIf (CurrentHour >= 9 and CurrentHour > 19) Then
-        ' 9AM - 7PM
-        SetHeat = DesiredWinter
-        SetCool = DesiredSummer
-        SetMode = 0
-      Else
-        ' 7PM - 11PM
-        SetHeat = DesiredWinter -1
-        SetCool = DesiredSummer
-        SetMode = 0
-      End If
+      Dim TimeOfDayFunctionResult As Integer() = TimeOfDayAdjustments(CurrentHour,SetHeat,SetCool,SetMode,DesiredWinter,DesiredSummer)
 
-      ' If it's earlier than 4PM and the high for the day is higher than
-      ' 50, lower the temperature by 1 to help from making the house too
-      ' hot during the day.
-      If (TemperatureHigh > 50 And CurrentHour < 16) Then
-        SetHeat = SetHeat - 1
-      End If
+      ' Save results of function
+      SetHeat = TimeOfDayFunctionResult(0)
+      SetCool = TimeOfDayFunctionResult(1)
+      SetMode = TimeOfDayFunctionResult(2)
 
+      hs.WriteLog("HvacController", "Time adjusted temperatures (Heat: " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
 
       ' ========================================================================
       ' Average Temperature Alterations
       ' ========================================================================
-      ' If the system is not active, check if the set points should be
-      ' adjusted based on the AverageTemperature.
+      ' If the system is not active, check if the set points should be adjusted
+      ' based on the AverageTemperature.
       If (CurrentOperatingState = 0) Then
         Dim HeatDifference As Double = Math.Abs(AverageTemperature - SetHeat)
         Dim CoolDifference As Double = Math.Abs(AverageTemperature - SetCool)
         Dim FloorDifference As Double = Math.Abs(AverageDownstairs - AverageUpstairs)
 
-        ' Adjust Heating
-        If (HeatDifference >= 3) Then
-          If (AverageTemperature > SetHeat) Then
-            SetHeat = SetHeat - 2
-            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-          Else
-            SetHeat = SetHeat + 2
-            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-          End If
-        Else If (HeatDifference >= 2 And OccupancyMode <> 0) Then
-          SetMode = 1
-        End If
+        Dim AverageAdjustments(HeatDifference,CoolDifference,FloorDifference,AverageTemperature,SetHeat,SetCool,SetMode)
 
-        ' Adjust Cooling
-        If (CoolDifference >= 3) Then
-          If (AverageTemperature > SetCool) Then
-            SetCool = SetCool - 2
-            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-          Else
-            SetCool = SetCool + 1
-            hs.WriteLog("HVAC Automation Debug", "Adjusting for average temperature")
-            SetMode = 1
-          End If
-        Else If (CoolDifference >= 2 And OccupancyMode <> 0) Then
-          SetMode = 1
-        End If
+        ' Save results of function
+        SetHeat = AverageAdjustments(0)
+        SetCool = AverageAdjustments(1)
+        SetMode = AverageAdjustments(2)
 
-        ' Adjust for differences in floor
-        If (FloorDifference > 2 And OccupancyMode <> 0) Then
-          SetMode = 1
-        End If
-      End If
-
-      ' ========================================================================
-      ' Night Time Override
-      ' ========================================================================
-      ' If it's night time, make sure the bedrooms haven't becoming dramatically
-      ' warmer or colder than what the desired temperature is for that season. If
-      ' they are, set the thermostat to whatever it currently sees as the local
-      ' temperature to prevent the system from running.
-      If (CurrentHour > 21 or CurrentHour < 6) Then
-        If ((TemperatureHigh > 50) and (AverageBedroom < SetCool)) Then
-          ' It's summer and the bedrooms are colder than the desired temperature
-          SetCool = CurrentThermostatReading
-          hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
-        Else If ((TemperatureHigh <= 50) and (AverageBedroom > SetHeat)) Then
-          ' It's winter and the bedrooms are warmer than the desired temperature
-          SetHeat = CurrentThermostatReading
-          hs.WriteLog("HVAC Automation Debug", "Adjusting for bedrooms")
-        End If
-      End If
+        hs.WriteLog("HvacController", "Average adjustments (Heat " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
 
     Else If ( OccupancyMode = 0 ) Then
       ' Vacation
@@ -204,18 +133,18 @@ Sub Main(parms As Object)
     End If
 
     ' ==========================================================================
-    ' Seasonal Adjustments
+    ' Sanity Checks
     ' ==========================================================================
+    ' All of the previous adjustments use the same logic to set the winter and
+    ' summer temperatures. Now determine what season it is to prevent the wrong
+    ' system from running.
     If ( TemperatureHigh > 50 ) Then
       SetHeat = SetHeat - 20
     Else
       SetCool = SetCool + 20
     End If
 
-
-    ' ==========================================================================
-    ' Sanity Check
-    ' ==========================================================================
+    ' Prevent any of the adjustments from getting too far in either extreme.
     If ( SetHeat < 55 ) Then
       SetHeat = 55
     End If
@@ -255,16 +184,123 @@ Sub Main(parms As Object)
     ' Output
     ' ==========================================================================
     If (SetMode = 0) Then
-      hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: Auto | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
+      hs.WriteLog("HvacController", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: Auto | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
     Else
-      hs.WriteLog("HVAC Automation", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: On | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
+      hs.WriteLog("HvacController", "HVAC mode was set to (Cool: " & SetCool & " | Heat: " & SetHeat & " | Fan: On | Temp: " & hs.DeviceValue(43) & " | Avg: " & AverageTemperature &")")
     End If
   End If
 End Sub
 
 ' ==============================================================================
-' Make the Capi Happy
+' Functions
 ' ==============================================================================
+' TimeOfDayAdjustments
+' 
+' Adjust the set points for the thermostat based on the time of day.
+' ==============================================================================
+Sub TimeOfDayAdjustments(CurrentHour As Integer,SetHeat As Integer,SetCool As Integer,SetMode As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
+  ' Start by determining desired temperature based on the current time
+  If (CurrentHour >= 23 or CurrentHour < 5) Then
+    ' 11PM - 5AM
+    SetHeat = DesiredWinter - 2
+    SetCool = DesiredSummer - 2
+    SetMode = 0
+  ElseIf (CurrentHour >= 5 and CurrentHour < 9) Then
+    ' 5AM - 9AM
+    SetHeat = DesiredWinter + 2
+    SetCool = DesiredSummer - 1
+    SetMode = 1
+  ElseIf (CurrentHour >= 9 and CurrentHour > 19) Then
+    ' 9AM - 7PM
+    SetHeat = DesiredWinter
+    SetCool = DesiredSummer
+    SetMode = 0
+  Else
+    ' 7PM - 11PM
+    SetHeat = DesiredWinter -1
+    SetCool = DesiredSummer
+    SetMode = 0
+  End If
+
+  ' Return array
+  Return {SetHeat,SetCool,SetMode}
+End Sub
+
+' ==============================================================================
+' ExtremeTemperatureAdjustments
+'
+' Adjust the desired temperatures based on temperature extremes and time of day
+' ==============================================================================
+Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh As Integer,CurrentHour As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
+  If (CurrentHour > 3 And CurrentHour < 9 And TemperatureHigh > 90) Then
+    ' In the morning, if the high is over 90, lower the temperature by 1 degree
+    ' to cool the house down before it gets warmer to make it easier to maintain
+    ' the desired temperature later.
+      DesiredSummer = DesiredSummer - 1
+  ElseIf (CurrentHour > 3 And CurrentHour < 16 And TemperatureHigh > 50) Then
+    ' During the day, if the high is above 50, lower the winter temperature by
+    ' 1 degree to prevent the house from getting too warm from the sun.
+    DesiredWinter = DesiredWinter - 1
+  End If
+
+  ' After the above section makes adjustments for the time and high for the day,
+  ' adjust for the current temperature outside.
+  If (OutsideTemperature > 105) Then
+    DesiredSummer = DesiredSummer + 2
+  ElseIf (OutsideTemperature > 85) Then
+    DesiredSummer = DesiredSummer + 1
+  ElseIf (OutsideTemperature < 0) Then
+    DesiredWinter = DesiredWinter - 2
+  ElseIf (OutsideTemperature < 10) Then
+    DesiredWinter = DesiredWinter - 1
+  End If
+
+  ' Return array
+  Return {DesiredWinter,DesiredSummer}
+End Sub
+
+' ==============================================================================
+' AverageAdjustments
+'
+' Adjust the set points if there are dramatic differences between upstairs and
+' downstairs
+' ==============================================================================
+Sub AverageAdjustments(HeatDifference As Double,CoolDifference As Double,FloorDifference As Double,AverageTemperature As Integer,SetHeat As Integer,SetCool As Integer,SetMode As Integer)
+  ' Adjust Heating
+  If (HeatDifference >= 3) Then
+    If (AverageTemperature > SetHeat) Then
+      SetHeat = SetHeat - 2
+    Else
+      SetHeat = SetHeat + 2
+    End If
+  Else If (HeatDifference >= 2) Then
+    SetMode = 1
+  End If
+
+  ' Adjust Cooling
+  If (CoolDifference >= 3) Then
+    If (AverageTemperature > SetCool) Then
+      SetCool = SetCool - 2
+    Else
+      SetCool = SetCool + 1
+      SetMode = 1
+    End If
+  Else If (CoolDifference >= 2) Then
+    SetMode = 1
+  End If
+
+  ' Adjust for differences in floor
+  If (FloorDifference > 2) Then
+    SetMode = 1
+  End If
+
+  ' Return array
+  Return {SetHeat,SetCool,SetMode}
+End Sub
+
+' ==============================================================================
+' Make the Capi Happy
+'
 ' Set a device using CAPI
 ' ==============================================================================
 Sub MakeTheCapiHappy(CapiControlString As String, DeviceReferenceID As Integer, SetValue As Double)
