@@ -37,6 +37,7 @@ Sub Main(Param As Object)
   Dim TaskPeriod As String
   Dim TaskName As String
   Dim TaskId As Integer
+  Dim TaskAge As Integer
   Dim Message As String = ""
   Dim IntervalDays As Integer
   Dim IntervalMin As Double
@@ -55,9 +56,11 @@ Sub Main(Param As Object)
       TaskType = TaskString(1)
       TaskPeriod = TaskString(2)
       TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
+      IntervalMin = hs.DeviceTime(TaskId)
+      IntervalDays = Math.Round((IntervalMin/1440),0,MidpointRounding.AwayFromZero)
 
       ' Log discovery
-      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & hs.DeviceTime(TaskId)/1440)
+      hs.WriteLog("Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & TaskAge)
 
       ' ==================================================================
       ' 
@@ -78,12 +81,8 @@ Sub Main(Param As Object)
         Case = "Interval"
           ' If the device is off, check for how long
           If (hs.DeviceValue(TaskId) = 0) Then
-            ' Convert minutes to days, rounding down
-            IntervalMin = hs.DeviceTime(TaskId)
-            IntervalDays = Math.Round((IntervalMin/1440),0,MidpointRounding.AwayFromZero)
-
             ' Check the interval against the setting
-            If (IntervalDays > TaskPeriod) Then
+            If (TaskAge > TaskPeriod) Then
               ' Turn the device on
               hs.SetDeviceValueByRef(hs.DeviceValue(TaskId),100,True)
             End If
