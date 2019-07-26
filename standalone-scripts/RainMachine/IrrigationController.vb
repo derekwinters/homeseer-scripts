@@ -9,12 +9,12 @@ Sub Main(Parm As Object)
   ' Load devices and data
   ' ============================================================================
 	' RainMachine devices
-  Dim Zone1 As Integer = 358
-  Dim Zone2 As Integer = 359
-  Dim Zone3 As Integer = 360
-  Dim Zone4 As Integer = 361
-  Dim Zone5 As Integer = 362
-  Dim Zone6 As Integer = 363
+  Dim Zone1 As Integer = 387
+  Dim Zone2 As Integer = 388
+  Dim Zone3 As Integer = 389
+  Dim Zone4 As Integer = 390
+  Dim Zone5 As Integer = 391
+  Dim Zone6 As Integer = 392
 
   ' Zone Default Runtimes
   Dim Zone1Time As Integer = 40
@@ -37,6 +37,9 @@ Sub Main(Parm As Object)
 
   ' Today's high temperature
   Dim TemperatureHigh As Integer = hs.DeviceValue(32)
+  
+  ' Create message string
+  Dim Message As String
 
   ' ============================================================================
   ' Determine water needed
@@ -56,7 +59,7 @@ Sub Main(Parm As Object)
   ' Set the zone times if rain is still needed
   ' ============================================================================
   If WaterNeeded > 0 Then
-    hs.WriteLog("IrrigationController","An additional " & WaterNeeded & " inches of water are needed to achieve the desired " & DesiredWaterInches & " total inches.")
+    hs.WriteLog("Irrigation Controller","An additional " & WaterNeeded & " inches of water are needed to achieve the desired " & DesiredWaterInches & " total inches.")
 
     If RainMultiplier > MinimumRuntime Then
       ' Use the multiplier
@@ -68,9 +71,15 @@ Sub Main(Parm As Object)
       Zone6Time = Zone6Time * RainMultiplier
 
       ' Log the zone times
-      hs.WriteLog("IrrigationController","Beginning irrigation (Zone1: " & Zone1 & " | Zone2: " & Zone2 & " | Zone3: " & Zone3 & " | Zone4: " & Zone4 & " | Zone5: " & Zone5 & " | Zone6: " & Zone6 & ")"
+      Message = "Beginning irrigation (Zone1: " & Zone1Time & " | Zone2: " & Zone2Time & " | Zone3: " & Zone3Time & " | Zone4: " & Zone4Time & " | Zone5: " & Zone5Time & " | Zone6: " & Zone6Time & ")"
+      hs.WriteLog("Irrigation Controller",Message)
+      Message = Message.Replace("(","<br />")
+      Message = Message.Replace(" | "," minutes<br />")
+      Message = Message.Replace(")"," minutes")
+      SendMessage("Rain Machine",Message)
 
-      ' Run the program
+      ' Set the program to run. Rain Machine will only allow one zone to run at
+      ' a time, so there is no need to wait for zones to complete.
       ZoneController(Zone1,Zone1Time)
       ZoneController(Zone2,Zone2Time)
       ZoneController(Zone3,Zone3Time)
@@ -78,28 +87,81 @@ Sub Main(Parm As Object)
       ZoneController(Zone5,Zone5Time)
       ZoneController(Zone6,Zone6Time)
 
-      hs.WriteLog("IrrigationController","Irrigation complete.")
+      hs.WriteLog("Irrigation Controller","Irrigation configuration complete.")
 
     Else
-      hs.WriteLog("IrrigationController","The rain multiplier " & RainMulitplier & " is below the minimum threshold " & MinimumRuntime)
+      hs.WriteLog("Irrigation Controller","The rain multiplier " & RainMultiplier & " is below the minimum threshold " & MinimumRuntime)
     End If
   End If
 End Sub
 
+' ==============================================================================
+' Zone Controller
+' ==============================================================================
 Sub ZoneController (ZoneId As Integer,ZoneRuntime As Integer)
-  hs.WriteLog("IrrigationController","Running zone " & ZoneId & " for " & ZoneRuntime & " minutes.")
+  hs.WriteLog("Irrigation Controller","Setting zone " & hs.DeviceName(ZoneId) & " to run for for " & ZoneRuntime & " minutes.")
 
   ' Start the zone
+  ZoneRuntime = ZoneRuntime * 60
+  MakeTheCapiHappy("Run for(value) Seconds",ZoneId,ZoneRuntime)
 
+  ' Wait 10 seconds just to not run too fast
+  Threading.Thread.Sleep(10000)
+End Sub
 
-  ' Sleep for the approximate runtime of the zone (milliseconds)
-  Threading.Thread.Sleep(ZoneRuntime * 60000)
+' ==============================================================================
+' Make the Capi Happy
+'
+' Set a device using CAPI
+' ==============================================================================
+Sub MakeTheCapiHappy(CapiControlString As String, DeviceReferenceID As Integer, SetValue As Double)
+  ' Create device
+  Dim CapiControlDevice as HomeSeerAPI.CAPI.CAPIControl = hs.CAPIGetSingleControl(DeviceReferenceID, True, CapiControlString, False, False)
 
-  ' Wait for the zone to complete
-  While hs.DeviceValue(ZoneId) <> 0
-    ' Check every 10 seconds to watch for the final zone completion
-    Threading.Thread.Sleep(10000)
-  End While
+  ' Set value
+  CapiControlDevice.ControlValue = SetValue
 
-  hs.WriteLog("IrrigationController","Zone " & ZoneId & " has completed.")
+  ' Persist the value
+  hs.CAPIControlHandler(CapiControlDevice)
+End Sub
+
+' ==============================================================================
+' Send Message
+' ==============================================================================
+Sub SendMessage(SubjectString As String, MessageString As String)
+
+    ' Set up enumerator
+	Dim Device As Scheduler.Classes.DeviceClass
+	Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
+
+	' Start
+	Enumerator = hs.GetDeviceEnumerator
+
+	' Check
+	If (Enumerator Is Nothing) Then
+		hs.WriteLog("MMS Messaging", "Error getting enumerator")
+		Exit Sub
+	End If
+
+	' Loop and send messages
+	Do While Not Enumerator.Finished
+		Device = Enumerator.GetNext
+
+		If (Device Is Nothing) Then
+			Continue Do
+		End If
+
+		' If the device type string is MMSPhoneNumber and the device is on,
+		' send the message. Checking if the device is off allows for easily
+		' disabling sending to a specific number without modifying scripts.
+		If (Device.Device_Type_String(hs) = "MMSPhoneNumber") Then
+			If (hs.DeviceValue(Device.ref(hs)) = 100) Then
+				hs.SendEmail(hs.DeviceString(Device.ref(hs)), hs.DeviceString(174), "", "", SubjectString, MessageString, "")
+			Else
+				hs.WriteLog("MMS Messaging", "Device is disabled for messaging (ReferenceID: " & Device.ref(hs) & ")")
+			End If
+		End If
+
+	Loop
+	
 End Sub
