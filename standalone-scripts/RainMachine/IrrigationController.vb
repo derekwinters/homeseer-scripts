@@ -13,10 +13,10 @@ Sub Main(Parm As Object)
 
   ' Check if the water received in the last four days is less than the desired
   ' amount of water. If it is, calculate the water requirements.
-  If (RecentWaterTotal < DesiredWaterInches Then
+  If RecentWaterTotal < DesiredWaterInches Then
     CalculateWaterRequirement(RecentWaterTotal,DesiredWaterInches)
   Else
-    hs.WriteLog("Irrigation Controller","Enough water has been received in the last four days, irrigation is not needed."
+    hs.WriteLog("Irrigation Controller","Enough water has been received in the last four days, irrigation is not needed.")
   End If
 End Sub
 
@@ -77,8 +77,6 @@ Sub IrrigationRun (RainMultiplier As Double)
   ' ============================================================================
   ' Set the zone times
   ' ============================================================================
-  hs.WriteLog("Irrigation Controller","An additional " & WaterNeeded & " inches of water are needed to achieve the desired " & DesiredWaterInches & " total inches.")
-
   ' Use the multiplier
   Zone1Time = Zone1Time * RainMultiplier
   Zone2Time = Zone2Time * RainMultiplier
@@ -107,8 +105,7 @@ Sub IrrigationRun (RainMultiplier As Double)
   hs.WriteLog("Irrigation Controller","Irrigation configuration complete. Adding water amount to tracking devices.")
 
   ' Set the day0 device
-  hs.SetDeviceValue(414,(hs.DeviceValue(414) + RainMultiplier, True)
-End If
+  hs.SetDeviceValue(414,(hs.DeviceValue(414) + RainMultiplier), True)
 End Sub
 
 ' ==============================================================================
