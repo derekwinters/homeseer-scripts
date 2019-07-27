@@ -3,6 +3,7 @@
 ' ==============================================================================
 Sub Main (Param As Object)
   ' Store the existing values
+  Dim Day6 As Integer
   Dim Day5 As Integer = hs.DeviceValue(419)
   Dim Day4 As Integer = hs.DeviceValue(418)
   Dim Day3 As Integer = hs.DeviceValue(417)
@@ -11,12 +12,13 @@ Sub Main (Param As Object)
   Dim Day0 As Integer = hs.DeviceValue(414)
 
   ' Calculate new values
-  Day1 = Day1 + Day0
-  Day2 = Day2 + Day1
-  Day3 = Day3 + Day2
-  Day4 = Day4 + Day3
-  Day5 = Day5 + Day4
-  Day6 = Day6 + Day5
+  Day6 = Day0 + Day1 + Day2 + Day3 + Day4 + Day5
+  Day5 = Day0 + Day1 + Day2 + Day3 + Day4
+  Day4 = Day0 + Day1 + Day2 + Day3
+  Day3 = Day0 + Day1 + Day2
+  Day2 = Day0 + Day1
+  Day1 = Day0
+  Day0 = 0
 
   ' Set the new values
   hs.SetDeviceValueByRef((420),hs.Day6,True)
