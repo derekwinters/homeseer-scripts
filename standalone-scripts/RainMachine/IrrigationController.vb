@@ -44,10 +44,10 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
     IrrigationRun(RainMultiplier)
   Else
     hs.WriteLog("Irrigation Controller","The water needed (" & WaterNeeded & "/10 inches) is below the minimum threshold (" & MinimumRuntime & " inches).")
+  End If
 
   ' Set the day0 device
   hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
-  End If
 End Sub
 
 ' ==============================================================================
