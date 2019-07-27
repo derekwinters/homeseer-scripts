@@ -12,10 +12,10 @@ Sub Main (Param As Object)
   Dim Day0 As Integer = hs.DeviceValue(414)
 
   ' Calculate new values
-  Day6 = Day0 + Day1 + Day2 + Day3 + Day4 + Day5
-  Day5 = Day0 + Day1 + Day2 + Day3 + Day4
-  Day4 = Day0 + Day1 + Day2 + Day3
-  Day3 = Day0 + Day1 + Day2
+  Day6 = Day0 + Day5
+  Day5 = Day0 + Day4
+  Day4 = Day0 + Day3
+  Day3 = Day0 + Day2
   Day2 = Day0 + Day1
   Day1 = Day0
   Day0 = 0
