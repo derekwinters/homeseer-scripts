@@ -35,7 +35,7 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
 
   ' Check if the water needed meeds the requirements
   If WaterNeeded > MinimumRuntime Then
-    hs.WriteLog("IrrigationController",WaterNeeded & " inches of water are needed, running the irrigation system.")
+    hs.WriteLog("Irrigation Controller",WaterNeeded & " inches of water are needed, running the irrigation system.")
 
     ' Determine how to modify the irrigation system based on the needed water
     ' and run the irrigation system.
@@ -55,6 +55,8 @@ End Sub
 ' calculations from rain water.
 ' ==============================================================================
 Sub IrrigationRun (RainMultiplier As Double)
+  hs.WriteLog("Irrigation Controller","Setting irrigation zones with a multiplier of " & RainMultiplier)
+
   ' RainMachine devices
   Dim Zone1 As Integer = 387
   Dim Zone2 As Integer = 388
