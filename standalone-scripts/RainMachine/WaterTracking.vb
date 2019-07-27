@@ -21,11 +21,11 @@ Sub Main (Param As Object)
   Day0 = 0
 
   ' Set the new values
-  hs.SetDeviceValueByRef((420),hs.Day6,True)
-  hs.SetDeviceValueByRef((419),hs.Day5,True)
-  hs.SetDeviceValueByRef((418),hs.Day4,True)
-  hs.SetDeviceValueByRef((417),hs.Day3,True)
-  hs.SetDeviceValueByRef((416),hs.Day2,True)
-  hs.SetDeviceValueByRef((415),hs.Day1,True)
-  hs.SetDeviceValueByRef((414),0,True)
+  hs.SetDeviceValueByRef((420),Day6,True)
+  hs.SetDeviceValueByRef((419),Day5,True)
+  hs.SetDeviceValueByRef((418),Day4,True)
+  hs.SetDeviceValueByRef((417),Day3,True)
+  hs.SetDeviceValueByRef((416),Day2,True)
+  hs.SetDeviceValueByRef((415),Day1,True)
+  hs.SetDeviceValueByRef((414),Day0,True)
 End Sub
