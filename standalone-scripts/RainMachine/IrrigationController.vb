@@ -6,7 +6,7 @@
 ' ==============================================================================
 Sub Main(Parm As Object)
   ' Water received in the last four days
-  Dim RecentWaterTotal As Double = hs.DeviceValue(418)
+  Dim RecentWaterTotal As Double = hs.DeviceValue(417)
 
   ' Desired water amount
   Dim DesiredWaterInches As Double = hs.DeviceValue(408)
