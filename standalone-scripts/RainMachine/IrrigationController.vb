@@ -105,7 +105,7 @@ Sub IrrigationRun (RainMultiplier As Double)
   hs.WriteLog("Irrigation Controller","Irrigation configuration complete. Adding water amount to tracking devices.")
 
   ' Set the day0 device
-  hs.SetDeviceValue(414,(hs.DeviceValue(414) + RainMultiplier), True)
+  hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + RainMultiplier), True)
 End Sub
 
 ' ==============================================================================
