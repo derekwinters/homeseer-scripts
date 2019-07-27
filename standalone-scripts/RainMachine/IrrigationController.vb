@@ -6,10 +6,10 @@
 ' ==============================================================================
 Sub Main(Parm As Object)
   ' Water received in the last four days
-  Dim RecentWaterTotal As Double = hs.DeviceValue(417)
+  Dim RecentWaterTotal As Integer = hs.DeviceValue(417)
 
   ' Desired water amount
-  Dim DesiredWaterInches As Double = hs.DeviceValue(408)
+  Dim DesiredWaterInches As Integer = hs.DeviceValue(408)
 
   ' Check if the water received in the last four days is less than the desired
   ' amount of water. If it is, calculate the water requirements.
@@ -23,31 +23,27 @@ End Sub
 ' ==============================================================================
 ' Calculate how much water is needed to meet the 4 day requirements
 ' ==============================================================================
-' Determine how to modify the baseline zones and if it meets the minimum
-' runtime requirements.
+' Determine how to modify the baseline zones and if it meets the minimum water
+' requirements.
 ' ==============================================================================
 Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As Double)
-  ' Minimum Run Percentage
-  Dim MinimumRuntime As Double = 0.60
+  ' Minimum Water (x/10 inches)
+  Dim MinimumWater As Integer = 3
 
   ' Subtract the recent water from what is desired
-  Dim WaterNeeded As Double = DesiredWaterInches - RecentWaterTotal
+  Dim WaterNeeded As Integer = DesiredWaterInches - RecentWaterTotal
 
   ' Check if the water needed meeds the requirements
-  If WaterNeeded > MinimumRuntime Then
-    hs.WriteLog("Irrigation Controller",WaterNeeded & " inches of water are needed, running the irrigation system.")
+  If WaterNeeded >= MinimumWater Then
+    hs.WriteLog("Irrigation Controller","A total of " & WaterNeeded & "/10 inches of water are needed, running the irrigation system.")
 
-    ' Determine how to modify the irrigation system based on the needed water
-    ' and run the irrigation system.
-    Dim RainMultiplier As Double = WaterNeeded / DesiredWaterInches
+    IrrigationRun(WaterNeeded)
 
-    IrrigationRun(RainMultiplier)
+    ' Set the day0 device
+    hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
   Else
     hs.WriteLog("Irrigation Controller","The water needed (" & WaterNeeded & "/10 inches) is below the minimum threshold (" & MinimumRuntime & " inches).")
   End If
-
-  ' Set the day0 device
-  hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
 End Sub
 
 ' ==============================================================================
@@ -57,8 +53,8 @@ End Sub
 ' zone. Accept a parameter to modify those runtimes based on previous water
 ' calculations from rain water.
 ' ==============================================================================
-Sub IrrigationRun (RainMultiplier As Double)
-  hs.WriteLog("Irrigation Controller","Setting irrigation zones with a multiplier of " & RainMultiplier)
+Sub IrrigationRun (WaterNeeded As Integer)
+  hs.WriteLog("Irrigation Controller","Setting irrigation zones to water " & WaterNeeded & " inches.")
 
   ' RainMachine devices
   Dim Zone1 As Integer = 387
@@ -68,13 +64,13 @@ Sub IrrigationRun (RainMultiplier As Double)
   Dim Zone5 As Integer = 391
   Dim Zone6 As Integer = 392
 
-  ' Zone Default Runtimes
-  Dim Zone1Time As Integer = 40
-  Dim Zone2Time As Integer = 40
-  Dim Zone3Time As Integer = 40
-  Dim Zone4Time As Integer = 40
-  Dim Zone5Time As Integer = 25
-  Dim Zone6Time As Integer = 25
+  ' Zone runtime per 1/10 inch
+  Dim Zone1Time As Integer = 8
+  Dim Zone2Time As Integer = 8
+  Dim Zone3Time As Integer = 8
+  Dim Zone4Time As Integer = 8
+  Dim Zone5Time As Integer = 5
+  Dim Zone6Time As Integer = 5
 
   ' Create message string
   Dim Message As String
@@ -83,12 +79,12 @@ Sub IrrigationRun (RainMultiplier As Double)
   ' Set the zone times
   ' ============================================================================
   ' Use the multiplier
-  Zone1Time = Zone1Time * RainMultiplier
-  Zone2Time = Zone2Time * RainMultiplier
-  Zone3Time = Zone3Time * RainMultiplier
-  Zone4Time = Zone4Time * RainMultiplier
-  Zone5Time = Zone5Time * RainMultiplier
-  Zone6Time = Zone6Time * RainMultiplier
+  Zone1Time = Zone1Time * WaterNeeded
+  Zone2Time = Zone2Time * WaterNeeded
+  Zone3Time = Zone3Time * WaterNeeded
+  Zone4Time = Zone4Time * WaterNeeded
+  Zone5Time = Zone5Time * WaterNeeded
+  Zone6Time = Zone6Time * WaterNeeded
 
   ' Log the zone times
   Message = "Beginning irrigation (Zone1: " & Zone1Time & " | Zone2: " & Zone2Time & " | Zone3: " & Zone3Time & " | Zone4: " & Zone4Time & " | Zone5: " & Zone5Time & " | Zone6: " & Zone6Time & ")"
@@ -120,7 +116,7 @@ Sub ZoneController (ZoneId As Integer,ZoneRuntime As Integer)
 
   ' Start the zone
   ZoneRuntime = ZoneRuntime * 60
-'  MakeTheCapiHappy("Run for(value) Seconds",ZoneId,ZoneRuntime)
+  MakeTheCapiHappy("Run for(value) Seconds",ZoneId,ZoneRuntime)
 
   ' Wait 10 seconds just to not run too fast
   Threading.Thread.Sleep(10000)
