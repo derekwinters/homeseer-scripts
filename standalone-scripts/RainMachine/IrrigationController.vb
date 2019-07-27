@@ -43,7 +43,10 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
 
     IrrigationRun(RainMultiplier)
   Else
-    hs.WriteLog("Irrigation Controller","The water needed (" & WaterNeeded & " inches) is below the minimum threshold (" & MinimumRuntime & " inches).")
+    hs.WriteLog("Irrigation Controller","The water needed (" & WaterNeeded & "/10 inches) is below the minimum threshold (" & MinimumRuntime & " inches).")
+
+  ' Set the day0 device
+  hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
   End If
 End Sub
 
@@ -104,10 +107,7 @@ Sub IrrigationRun (RainMultiplier As Double)
   ZoneController(Zone5,Zone5Time)
   ZoneController(Zone6,Zone6Time)
 
-  hs.WriteLog("Irrigation Controller","Irrigation configuration complete. Adding water amount to tracking devices.")
-
-  ' Set the day0 device
-  hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + RainMultiplier), True)
+  hs.WriteLog("Irrigation Controller","Irrigation configuration complete.")
 End Sub
 
 ' ==============================================================================
