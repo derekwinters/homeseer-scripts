@@ -8,15 +8,15 @@ Sub Main(Parm As Object)
   ' Water received in the last four days
   Dim RecentWaterTotal As Integer = hs.DeviceValue(417)
 
-  ' Desired water amount
-  Dim DesiredWaterInches As Integer = hs.DeviceValue(408)
+  ' Standard desired water amount + carryover
+  Dim DesiredWaterInches As Integer = hs.DeviceValue(408) + hs.DeviceValue(421)
 
   ' Check if the water received in the last four days is less than the desired
   ' amount of water. If it is, calculate the water requirements.
   If RecentWaterTotal < DesiredWaterInches Then
     CalculateWaterRequirement(RecentWaterTotal,DesiredWaterInches)
   Else
-    hs.WriteLog("Irrigation Controller","Enough water has been received in the last four days, irrigation is not needed.")
+    hs.WriteLog("Irrigation Controller","Enough water has been received in the last four days (" & RecentWaterTotal & "/10 inches), irrigation is not needed.")
   End If
 End Sub
 
@@ -30,8 +30,16 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
   ' Minimum Water (x/10 inches)
   Dim MinimumWater As Integer = 3
 
+  ' Maximum Water (x/10 inches)
+  Dim MaximumWater As Integer = 8
+
   ' Subtract the recent water from what is desired
   Dim WaterNeeded As Integer = DesiredWaterInches - RecentWaterTotal
+
+  If WaterNeeded > MaximumWater Then
+    hs.WriteLog("Irrigation Controller","WaterNeeded (" & WaterNeeded & "/10 inches) is greater than the maximum allowed (" & MaximumWater & "/10 inches), resetting WaterNeeded.")
+    WaterNeeded = MaximumWater
+  End If
 
   ' Check if the water needed meeds the requirements
   If WaterNeeded >= MinimumWater Then
@@ -41,8 +49,16 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
 
     ' Set the day0 device
     hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
+
+    ' Clear the carryover
+    If hs.DeviceValue(421) <> 0 Then
+      hs.SetDeviceValueByRef(421,0,True)
+    End If
+  ElseIf WaterNeeded > 0 Then
+    hs.WriteLog("Irrigation Controller","The water needed (" & WaterNeeded & "/10 inches) is below the minimum threshold (" & MinimumWater & "/10 inches). This will be added to the next watering.")
+    hs.SetDeviceValueByRef(421,(hs.DeviceValue(421) + WaterNeeded),True)
   Else
-    hs.WriteLog("Irrigation Controller","The water needed (" & WaterNeeded & "/10 inches) is below the minimum threshold (" & MinimumRuntime & " inches).")
+    hs.WriteLog("Irrigation Controller","No water is needed.")
   End If
 End Sub
 
