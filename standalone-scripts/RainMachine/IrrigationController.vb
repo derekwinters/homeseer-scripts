@@ -70,7 +70,7 @@ End Sub
 ' calculations from rain water.
 ' ==============================================================================
 Sub IrrigationRun (WaterNeeded As Integer)
-  hs.WriteLog("Irrigation Controller","Setting irrigation zones to water " & WaterNeeded & " inches.")
+  hs.WriteLog("Irrigation Controller","Setting irrigation zones to water " & WaterNeeded & "/10 inches.")
 
   ' RainMachine devices
   Dim Zone1 As Integer = 387
