@@ -35,7 +35,7 @@ Sub Main(Parms As Object)
 
         Body = Body & Device.Location(hs) & " " & Device.Name(hs) & ": "
 
-        If BatteryValue =< 100 Then
+        If BatteryValue <= 100 Then
           Body = Body & BatteryValue
         Else If BatteryValue > 100 Then
           Body = Body & "Battery Low"
@@ -47,22 +47,18 @@ Sub Main(Parms As Object)
       Else
         hs.WriteLog("HVAC Automation", "Not alerting on device " & Device.ref(hs) & " value: " & hs.DeviceValue(Device.ref(hs)))
       End If
-
     End If
-
   Loop
 
   If (Total > 0) Then
     SendMessage("Battery Alert",Body)
   End If
-
 End Sub
 
 ' ==============================================================================
 ' Send Message
 ' ==============================================================================
 Sub SendMessage(SubjectString As String, MessageString As String)
-
   ' Set up enumerator
   Dim Device As Scheduler.Classes.DeviceClass
   Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
@@ -94,7 +90,5 @@ Sub SendMessage(SubjectString As String, MessageString As String)
         hs.WriteLog("MMS Messaging", "Device is disabled for messaging (ReferenceID: " & Device.ref(hs) & ")")
       End If
     End If
-
   Loop
-
 End Sub
