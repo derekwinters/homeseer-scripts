@@ -38,7 +38,7 @@ Sub Main(Parms As Object)
   Loop
 
   If (Total > 0) Then
-    'SendMessage("Battery Alert",Body)
+    SendMessage("Battery Alert",Body)
   End If
 
 End Sub
