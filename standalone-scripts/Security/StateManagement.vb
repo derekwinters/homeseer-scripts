@@ -59,6 +59,6 @@ Sub Main(parms As Object)
       End If
     End If
   Else
-    hs.WriteLog("Security System","Security delay is enabled for " & SecurityArmDelay & " hours, not changing security state.")
+    hs.WriteLog("Security System","Security delay is enabled for " & SecurityDelayArm & " hours, not changing security state.")
   End If
 end Sub
