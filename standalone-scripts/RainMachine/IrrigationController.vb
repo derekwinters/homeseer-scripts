@@ -81,8 +81,8 @@ Sub IrrigationRun (WaterNeeded As Integer)
   Dim Zone6 As Integer = 392
 
   ' Zone runtime per 1/10 inch
-  Dim Zone1Time As Integer = 8
-  Dim Zone2Time As Integer = 8
+  Dim Zone1Time As Integer = 10
+  Dim Zone2Time As Integer = 10
   Dim Zone3Time As Integer = 8
   Dim Zone4Time As Integer = 8
   Dim Zone5Time As Integer = 5
