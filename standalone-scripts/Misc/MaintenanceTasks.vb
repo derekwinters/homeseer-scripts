@@ -83,7 +83,7 @@ Sub Main(Param As Object)
             ' Check the interval against the setting
             If (TaskAge > TaskPeriod) Then
               ' Turn the device on
-              hs.SetDeviceValueByRef(hs.DeviceValue(TaskId),100,True)
+              hs.SetDeviceValueByRef(TaskId,100,True)
             End If
           End If
 
