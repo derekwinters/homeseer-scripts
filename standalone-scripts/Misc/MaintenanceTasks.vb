@@ -83,14 +83,14 @@ Sub Main(Param As Object)
             ' Check the interval against the setting
             If (TaskAge > TaskPeriod) Then
               ' Turn the device on
-              hs.SetDeviceValueByRef(hs.DeviceValue(TaskId),100,True)
+              hs.SetDeviceValueByRef(TaskId,100,True)
             End If
           End If
 
           ' Check again to see if the device was just turned on
           If (hs.DeviceValue(TaskId) = 100) Then
             ' The device is on, the task hasn't been completed
-            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />Replay 'Task " & TaskId & " complete to reset timer."
+            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />Reply 'Task " & TaskId & " complete' to reset timer."
           End If
       End Select
 
