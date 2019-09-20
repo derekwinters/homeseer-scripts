@@ -14,19 +14,26 @@
 ' ==============================================================================
 
 Sub Main(Parms as Object)
-  ' ========================================================
-  ' 
-  ' ========================================================
+  ' ============================================================================
+  ' Variables
+  ' ============================================================================
+  ' Enumerator devices
+  Dim Device As Scheduler.Classes.DeviceClass
+  Dim Enumerator As Scheduler.Classes.clsDeviceEnumeration
+
   ' Counting variables
   Dim VacationCount As Integer = 0
   Dim OccupancyCount As Integer = 0
   Dim UserTotal As Integer = 2
   Dim GuestCount As Integer = 0
+
   ' Static Devices
   Dim TrackerGuest As Integer = 445
   Dim TrackerBabysitter As Integer = 25
 
+  ' ============================================================================
   ' Start
+  ' ============================================================================
   Enumerator = hs.GetDeviceEnumerator
   If Enumerator Is Nothing Then
     hs.WriteError("Occupancy"," Error getting enumerator")
