@@ -24,12 +24,17 @@ Sub Main(Parms as Object)
   ' Counting variables
   Dim VacationCount As Integer = 0
   Dim OccupancyCount As Integer = 0
-  Dim UserTotal As Integer = 2
+  Dim UserTotal As Integer = 0
   Dim GuestCount As Integer = 0
 
   ' Static Devices
   Dim TrackerGuest As Integer = 445
   Dim TrackerBabysitter As Integer = 25
+  
+  ' Device objects
+  Dim Custom_DeviceName As String = ""
+  Dim Custom_UserNote As Integer = 0
+  Dim Custom_Name As String = ""
 
   ' ============================================================================
   ' Start
@@ -48,17 +53,25 @@ Sub Main(Parms as Object)
       End If
 
       If Device.Device_Type_String(hs) = "BLLAN Plug-In Device" Then
-        If hs.DeviceName(Device.ref(hs)).Contains("Family") Then
-          MatchUserOccupancy(Device.Ref(hs),Device.UserNote(hs),hs.DeviceName(Device.ref(hs)).Replace("Network Devices Family ",""))
+        Custom_DeviceName = hs.DeviceName(Device.ref(hs))
+        Custom_Name = Custom_DeviceName.Replace("Network Devices ","")
+        If Device.UserNote(hs) <> "" Then
+          Custom_UserNote = Convert.toInt32(Device.UserNote(hs))
+        End If
+        
+        If Custom_Name.StartsWith("Family") Then
+          hs.WriteLog("Occupancy","Found " & Custom_Name & " (" & Device.Ref(hs) & ") Value: " & hs.DeviceValue(Device.Ref(hs)))
           UserTotal += 1
-          If hs.DeviceValueByRef(Device.UserNote(hs)) = 0 Then
+          MatchUserOccupancy(Device.Ref(hs),Custom_UserNote,Custom_Name)
+          If hs.DeviceValueEx(Custom_UserNote) = 0 Then
             VacationCount += 1
-          ElseIf hs.DeviceValueByRef(Device.UserNote(hs)) = 100 Then
+          ElseIf hs.DeviceValueEx(Custom_UserNote) = 100 Then
             OccupancyCount += 1
           End If
-        ElseIf hs.DeviceName(Device.ref(hs)).Contains("Guest") Then
+        ElseIf Custom_Name.StartsWith("Guest") Then
+          hs.WriteLog("Occupancy","Found " & Custom_Name & " (" & Device.Ref(hs) & ") Value: " & hs.DeviceValue(Device.Ref(hs)))
           If hs.DeviceValueEx(Device.ref(hs)) = 100 Then
-            hs.WriteLog("Occupancy",hs.DeviceName(Device.ref(hs)).Replace("Network Devices ","") & " is here")
+            hs.WriteLog("Occupancy",Custom_Name & " is here")
             GuestCount += 1
           End If
         End If
@@ -66,8 +79,8 @@ Sub Main(Parms as Object)
     Loop
 
     ' Enable the guest device if any guests are here
-    If hs.DeviceValueByRef(TrackerGuest) <> 100 And GuestCount > 0 Then
-'      hs.SetDeviceValueByRef(TrackerGuest,100,True)
+    If hs.DeviceValue(TrackerGuest) <> 100 And GuestCount > 0 Then
+      hs.SetDeviceValueByRef(TrackerGuest,100,True)
     End If
 
     ' Determine final occupancy settings
@@ -77,9 +90,9 @@ Sub Main(Parms as Object)
       hs.WriteLog("Occupancy","All non-vacation family members are home")
     ElseIf OccupancyCount > 0 Then
       hs.WriteLog("Occupancy","Some family members are home")
-    ElseIf hs.DeviceValueByRef(TrackerBabysitter) = 100 Then
+    ElseIf hs.DeviceValue(TrackerBabysitter) = 100 Then
       hs.WriteLog("Occupancy","Babysitter is home")
-    ElseIf hs.DeviceValueByRef(TrackerGuest) = 100 Then
+    ElseIf hs.DeviceValue(TrackerGuest) = 100 Then
       hs.WriteLog("Occupancy",GuestCount & " guests are home")
     ElseIf VacationCount = UserTotal Then
       hs.WriteLog("Occupancy","Vacation mode enabled")
@@ -91,15 +104,15 @@ Sub Main(Parms as Object)
 End Sub
 
 Sub MatchUserOccupancy(Device As Integer, User As Integer, Name As String)
-  If hs.DeviceValueByRef(Device) = 100 And hs.DeviceValueByRef(User) <> 100 Then
+  If hs.DeviceValue(Device) = 100 And hs.DeviceValue(User) <> 100 Then
     hs.WriteLog("Occupancy",Name & " arrived")
-'    hs.SetDeviceValueByRef(User,100,True)
-    If hs.DeviceValueByRef(25) = 100 Then
+    hs.SetDeviceValueByRef(User,100,True)
+    If hs.DeviceValue(25) = 100 Then
       hs.WriteLog("Occupancy","Babysitter tracking disabled.")
-'      hs.SetDeviceValueByRef(25,50,True)
+      hs.SetDeviceValueByRef(25,50,True)
     End If
-  ElseIf hs.DeviceValueByRef(Device) = 0 And hs.DeviceValueByRef(User) <> 0 Then
+  ElseIf hs.DeviceValue(Device) = 0 And hs.DeviceValue(User) <> 0 Then
     hs.WriteLog("Occupancy",Name & " left")
-'    hs.SetDeviceValueByRef(User,0,True)
+    hs.SetDeviceValueByRef(User,0,True)
   End If
 End Sub
