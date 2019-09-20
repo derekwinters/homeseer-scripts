@@ -73,7 +73,7 @@ Sub Main(Parms as Object)
     ' Determine final occupancy settings
     If OccupancyCount = UserTotal Then
       hs.WriteLog("Occupancy","All family members are home")
-    ElseIf OccupancyCount > 0 And OccupancyCount + VacationCount = UserCount Then
+    ElseIf OccupancyCount > 0 And OccupancyCount + VacationCount = UserTotal Then
       hs.WriteLog("Occupancy","All non-vacation family members are home")
     ElseIf OccupancyCount > 0 Then
       hs.WriteLog("Occupancy","Some family members are home")
