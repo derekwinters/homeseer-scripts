@@ -111,8 +111,8 @@ Sub MatchUserOccupancy(Device As Integer, User As Integer, Name As String)
       hs.WriteLog("Occupancy","Babysitter tracking disabled.")
       hs.SetDeviceValueByRef(25,50,True)
     End If
-  ElseIf hs.DeviceValue(Device) = 0 And hs.DeviceValue(User) <> 0 Then
+  ElseIf hs.DeviceValue(Device) = 0 And hs.DeviceValue(User) <> 50 Then
     hs.WriteLog("Occupancy",Name & " left")
-    hs.SetDeviceValueByRef(User,0,True)
+    hs.SetDeviceValueByRef(User,50,True)
   End If
 End Sub
