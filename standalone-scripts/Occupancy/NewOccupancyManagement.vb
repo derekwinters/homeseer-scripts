@@ -81,6 +81,8 @@ Sub Main(Parms as Object)
     ' Enable the guest device if any guests are here
     If hs.DeviceValue(TrackerGuest) <> 100 And GuestCount > 0 Then
       hs.SetDeviceValueByRef(TrackerGuest,100,True)
+    Else
+      hs.SetDeviceValueByRef(TrackerGuest,0,True)
     End If
 
     ' Determine final occupancy settings
