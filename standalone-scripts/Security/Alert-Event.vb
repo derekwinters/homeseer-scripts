@@ -65,7 +65,7 @@ Sub Main(parms As Object)
     ' ======================================================================
     ' Family Room Motion Sensor
     ' ======================================================================
-    If (hs.DeviceValue("112") <> 0) Then
+    If (hs.DeviceValue("440") <> 0) Then
       Body = Body & "- Motion in Family Room -<br />"
       If (hs.DeviceValue("28") = 100) Then
         Alarm = True
