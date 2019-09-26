@@ -30,6 +30,11 @@ Sub Main(Parms as Object)
   ' Static Devices
   Dim TrackerGuest As Integer = 445
   Dim TrackerBabysitter As Integer = 25
+  Dim OccupancyMode As Integer = 75
+  Dim OccupancyMode_Full As Integer = 100
+  Dim OccupancyMode_Occupied As Integer = 75
+  Dim OccupancyMode_Away As Integer = 25
+  Dim OccupancyMode_Vacation As Integer = 0
   
   ' Device objects
   Dim Custom_DeviceName As String = ""
@@ -88,18 +93,35 @@ Sub Main(Parms as Object)
     ' Determine final occupancy settings
     If OccupancyCount = UserTotal Then
       hs.WriteLog("Occupancy","All family members are home")
+      hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Full,True)
     ElseIf OccupancyCount > 0 And OccupancyCount + VacationCount = UserTotal Then
       hs.WriteLog("Occupancy","All non-vacation family members are home")
+      hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Full,True)
     ElseIf OccupancyCount > 0 Then
       hs.WriteLog("Occupancy","Some family members are home")
+      hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Occupied,True)
     ElseIf hs.DeviceValue(TrackerBabysitter) = 100 Then
-      hs.WriteLog("Occupancy","Babysitter is home")
+      If VacationCount = UserCount Then
+        hs.WriteLog("Occupancy","Babysitter is home")
+        hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Full,True)
+      Else
+        hs.WriteLog("Occupancy","Babysitter is home")
+        hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Occupied,True)
+      End If
     ElseIf hs.DeviceValue(TrackerGuest) = 100 Then
-      hs.WriteLog("Occupancy",GuestCount & " guests are home")
+      If VacationCount = UserTotal Then
+        hs.WriteLog("Occupancy",GuestCount & " guests are home")
+        hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Full,True)
+      Else
+        hs.WriteLog("Occupancy",GuestCount & " guests are home")
+        hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Occupied,True)
+      End If
     ElseIf VacationCount = UserTotal Then
       hs.WriteLog("Occupancy","Vacation mode enabled")
+      hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Vacation,True)
     Else
       hs.WriteLog("Occupancy","No one is home")
+      hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Away,True)
     End If
 
   End If
