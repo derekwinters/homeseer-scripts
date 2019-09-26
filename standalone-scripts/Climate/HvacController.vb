@@ -88,6 +88,8 @@ Sub Main(parms As Object)
     ' Adjust the desired temperature based on time of day
     ' ==========================================================================
     If (OccupancyMode = 100 OrElse OccupancyMode = 75 ) Then
+      hs.WriteLog("HvacController","Weather Values: Outside: " & OutsideTemperature & " High: " & TemperatureHigh & " Low: " & TemperatureLow)
+
       TimeOfDayAdjustments(CurrentHour,SetHeat,SetCool,SetMode,DesiredWinter,DesiredSummer)
 
       hs.WriteLog("HvacController", "Time adjusted temperatures (Heat: " & SetHeat & " | Cool: " & SetCool & " | Mode: " & SetMode & ")")
