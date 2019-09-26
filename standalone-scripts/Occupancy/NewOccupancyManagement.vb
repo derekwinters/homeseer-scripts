@@ -101,7 +101,7 @@ Sub Main(Parms as Object)
       hs.WriteLog("Occupancy","Some family members are home")
       hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Occupied,True)
     ElseIf hs.DeviceValue(TrackerBabysitter) = 100 Then
-      If VacationCount = UserCount Then
+      If VacationCount = UserTotal Then
         hs.WriteLog("Occupancy","Babysitter is home")
         hs.SetDeviceValueByRef(OccupancyMode,OccupancyMode_Full,True)
       Else
