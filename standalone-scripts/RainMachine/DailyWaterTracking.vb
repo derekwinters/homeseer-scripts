@@ -5,10 +5,10 @@
 ' ==============================================================================
 Sub Main (Param As Object)
   Dim WaterLastHour As Double = hs.DeviceValue(381)
-  Dim Day0 As Integer = hs.DeviceValue(414)
+  Dim Day0 As Double = hs.DeviceValue(414)
 
   ' Calculate new value
-  Day0 = Day0 + Math.Round((WaterLastHour*10),0,MidpointRounding.AwayFromZero)
+  Day0 = Day0 + Math.Round((WaterLastHour*10),1,MidpointRounding.AwayFromZero)
 
   ' Set the new value
   hs.SetDeviceValueByRef((414),Day0,True)

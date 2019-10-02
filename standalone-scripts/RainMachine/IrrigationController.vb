@@ -6,10 +6,10 @@
 ' ==============================================================================
 Sub Main(Parm As Object)
   ' Water received in the last four days
-  Dim RecentWaterTotal As Integer = hs.DeviceValue(417)
+  Dim RecentWaterTotal As Double = hs.DeviceValue(417)
 
   ' Standard desired water amount + carryover
-  Dim DesiredWaterInches As Integer = hs.DeviceValue(408) + hs.DeviceValue(421)
+  Dim DesiredWaterInches As Double = hs.DeviceValue(408) + hs.DeviceValue(421)
 
   ' Check if the water received in the last four days is less than the desired
   ' amount of water. If it is, calculate the water requirements.
@@ -34,7 +34,7 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
   Dim MaximumWater As Integer = 8
 
   ' Subtract the recent water from what is desired
-  Dim WaterNeeded As Integer = DesiredWaterInches - RecentWaterTotal
+  Dim WaterNeeded As Double = DesiredWaterInches - RecentWaterTotal
 
   If WaterNeeded > MaximumWater Then
     hs.WriteLog("Irrigation Controller","WaterNeeded (" & WaterNeeded & "/10 inches) is greater than the maximum allowed (" & MaximumWater & "/10 inches), resetting WaterNeeded.")
