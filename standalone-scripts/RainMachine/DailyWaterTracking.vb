@@ -9,7 +9,7 @@ Sub Main (Param As Object)
 
   ' Calculate new value
   Day0 = Day0 + Math.Round((WaterLastHour*10),2,MidpointRounding.AwayFromZero)
-  hs.WriteLog("Irrigation Controller",Math.Round((WaterLastHour*10),2,MidpointRounding.AwayFromZero) & "/10 inches of rain in the last hour")
+  hs.WriteLog("Irrigation Controller",WaterLastHour & " inches of rain in the last hour")
 
   ' Set the new value
   hs.SetDeviceValueByRef((414),Day0,True)
