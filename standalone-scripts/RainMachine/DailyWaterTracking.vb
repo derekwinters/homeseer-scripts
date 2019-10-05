@@ -8,7 +8,7 @@ Sub Main (Param As Object)
   Dim Day0 As Double = hs.DeviceValueEx(414)
 
   ' Calculate new value
-  Day0 = Day0 + Math.Round((WaterLastHour*10),2,MidpointRounding.AwayFromZero)
+  Day0 = Day0 + WaterLastHour
   hs.WriteLog("Irrigation Controller",WaterLastHour & " inches of rain in the last hour")
 
   ' Set the new value
