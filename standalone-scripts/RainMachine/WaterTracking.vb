@@ -3,13 +3,13 @@
 ' ==============================================================================
 Sub Main (Param As Object)
   ' Store the existing values
-  Dim Day6 As Integer
-  Dim Day5 As Integer = hs.DeviceValue(419)
-  Dim Day4 As Integer = hs.DeviceValue(418)
-  Dim Day3 As Integer = hs.DeviceValue(417)
-  Dim Day2 As Integer = hs.DeviceValue(416)
-  Dim Day1 As Integer = hs.DeviceValue(415)
-  Dim Day0 As Integer = hs.DeviceValue(414)
+  Dim Day6 As Double
+  Dim Day5 As Double = hs.DeviceValueEx(419)
+  Dim Day4 As Double = hs.DeviceValueEx(418)
+  Dim Day3 As Double = hs.DeviceValueEx(417)
+  Dim Day2 As Double = hs.DeviceValueEx(416)
+  Dim Day1 As Double = hs.DeviceValueEx(415)
+  Dim Day0 As Double = hs.DeviceValueEx(414)
 
   ' Calculate new values
   Day6 = Day0 + Day5
