@@ -203,7 +203,7 @@ Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef S
     SetHeat = DesiredWinter + 2
     SetCool = DesiredSummer - 1
     SetMode = 1
-  ElseIf (CurrentHour >= 9 and CurrentHour > 19) Then
+  ElseIf (CurrentHour >= 9 and CurrentHour < 19) Then
     ' 9AM - 7PM
     SetHeat = DesiredWinter
     SetCool = DesiredSummer
