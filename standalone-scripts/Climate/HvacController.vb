@@ -127,16 +127,12 @@ Sub Main(parms As Object)
     ' All of the previous adjustments use the same logic to set the winter and
     ' summer temperatures. Now determine what season it is to prevent the wrong
     ' system from running.
-    If (TemperatureHigh > 60) Then
-      If (TemperatureLow > 50) Then
-        SetHeat = SetHeat - 20
-      Else
-        SetHeat = SetHeat - 10
-      End If
-    ElseIf (TemperatureHigh > 50) Then
-      SetHeat = SetHeat - 2
-    Else
-      SetCool = SetCool + 20
+    If (TemperatureHigh < 45) Then
+      SetCool += 20
+    ElseIf (TemperatureHigh > 60 And TemperatureLow > 50) Then
+      SetHeat -= 10
+    ElseIf (TemperatureHigh > 50 And TemperatureLow > 40) Then
+      SetHeat -= 2
     End If
 
     ' Prevent any of the adjustments from getting too far in either extreme.
