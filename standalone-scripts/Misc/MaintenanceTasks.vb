@@ -42,6 +42,8 @@ Sub Main(Param As Object)
   Dim IntervalDays As Integer
   Dim IntervalMin As Double
   Dim LastChange As Date
+  Dim TaskMinDays As String
+  Dim TurnOnDevice As Boolean
 
   Do While Not Enumerator.Finished
     Device = Enumerator.GetNext
@@ -51,11 +53,23 @@ Sub Main(Param As Object)
     End If
 
     If (Device.Device_Type_String(hs).StartsWith("MaintenanceTask")) Then
+      ' Reset
+      TurnOnDevice = false
+
       TaskId = Device.ref(hs)
       ' Parse DeviceTypeString
       TaskString = Split(Device.Device_Type_String(hs).ToString," ")
       TaskType = TaskString(1)
       TaskPeriod = TaskString(2)
+
+      ' DayOfWeek supports a minDays value to allow Every x DayOfWeek
+      ' ie: DayOfWeek=Monday MinDays=8 (every other Monday).
+      If (TaskString.Count = 4) Then
+        TaskMinDays = TaskString(3)
+      Else
+        TaskMinDays = "0"
+      End If
+
       TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
       TaskAge = Math.Round((hs.DeviceTime(TaskId)/1440),0,MidpointRounding.AwayFromZero)
 
@@ -65,44 +79,46 @@ Sub Main(Param As Object)
       ' ==================================================================
       ' 
       ' ==================================================================
-      Select Case TaskType
-        Case = "DayOfWeek"
-          If ( TodayDay = TaskPeriod ) Then
-            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today."
-          End If
-        Case = "DayOfMonth"
-          If ( TodayNumber = TaskPeriod ) Then
-            Message = ""
-          End If
-        Case = "FirstDayOfMonth"
-          If ( TodayDay = TaskPeriod And TodayNumber <= 7 ) Then
-            Message = ""
-          End If
-        Case = "Interval"
-          ' If the device is off, check for how long
-          If (hs.DeviceValue(TaskId) = 0) Then
+      ' If the device is off, check if it should be turned on
+      If (hs.DeviceValue(TaskId) = 0) Then
+        Select Case TaskType
+          Case = "DayOfWeek"
+            If ( TodayDay = TaskPeriod ) Then
+              If (TaskAge > TaskMinDays) Then
+                TurnOnDevice = true
+              End If
+            End If
+          Case = "DayOfMonth"
+            If ( TodayNumber = TaskPeriod ) Then
+              TurnOnDevice = true
+            End If
+          Case = "FirstDayOfMonth"
+            If ( TodayDay = TaskPeriod And TodayNumber <= 7 ) Then
+              TurnOnDevice = true
+            End If
+          Case = "Interval"
             ' Check the interval against the setting
             If (TaskAge > TaskPeriod) Then
-              ' Save the LastChangeDateTime
-              LastChange = hs.DeviceDateTime(TaskId)
-
-              ' Turn the device on
-              hs.SetDeviceValueByRef(TaskId,100,True)
-
-              ' Reset the LastChange
-              hs.SetDeviceLastChange(TaskId,LastChange)
+              TurnOnDevice = true
             End If
-          End If
+        End Select
+      End If
 
-          ' Check again to see if the device was just turned on
-          If (hs.DeviceValue(TaskId) = 100) Then
-            ' The device is on, the task hasn't been completed
-            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId) & "<br /><br />Reply 'Task " & TaskId & " complete' to reset timer."
+      If (TurnOnDevice) Then
+        ' Save the LastChangeDateTime
+        LastChange = hs.DeviceDateTime(TaskId)
 
-          End If
-      End Select
+        ' Turn the device on
+        hs.SetDeviceValueByRef(TaskId,100,True)
 
-      If ( Message <> "" ) Then
+        ' Reset the LastChange
+        hs.SetDeviceLastChange(TaskId,LastChange)
+      End If
+
+      ' If a Device is On, the task is due
+      If (hs.DeviceValue(TaskId) = 100) Then
+        ' The device is on, the task hasn't been completed
+        Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId) & "<br /><br />Reply 'Task " & TaskId & " complete' to reset timer."
         SendMessage("Maintenance Task",Message)
         hs.WriteLog("Maintenance Task", Message)
         Message = ""
