@@ -97,7 +97,8 @@ Sub Main(Param As Object)
           ' Check again to see if the device was just turned on
           If (hs.DeviceValue(TaskId) = 100) Then
             ' The device is on, the task hasn't been completed
-            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />Reply 'Task " & TaskId & " complete' to reset timer.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId)
+            Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId) & "<br /><br />Reply 'Task " & TaskId & " complete' to reset timer."
+
           End If
       End Select
 
