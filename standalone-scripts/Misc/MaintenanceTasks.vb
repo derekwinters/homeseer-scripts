@@ -41,6 +41,7 @@ Sub Main(Param As Object)
   Dim Message As String = ""
   Dim IntervalDays As Integer
   Dim IntervalMin As Double
+  Dim LastChange As Date
 
   Do While Not Enumerator.Finished
     Device = Enumerator.GetNext
@@ -82,8 +83,14 @@ Sub Main(Param As Object)
           If (hs.DeviceValue(TaskId) = 0) Then
             ' Check the interval against the setting
             If (TaskAge > TaskPeriod) Then
+              ' Save the LastChangeDateTime
+              LastChange = hs.DeviceDateTime(TaskId)
+
               ' Turn the device on
               hs.SetDeviceValueByRef(TaskId,100,True)
+
+              ' Reset the LastChange
+              hs.SetDeviceLastChange(TaskId,LastChange)
             End If
           End If
 
