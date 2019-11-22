@@ -64,7 +64,7 @@ Sub Main(Param As Object)
       If Message <> "" Then
         Message += "<br />"
       End If
-      Message += "Maintenance Task", "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & TaskAge
+      Message += "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & TaskAge
     End If
 
     SendMessage("Maintenance Task Status",Message)
