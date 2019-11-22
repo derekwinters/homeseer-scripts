@@ -64,7 +64,12 @@ Sub Main(Param As Object)
       If Message <> "" Then
         Message += "<br /><br />"
       End If
-      Message += TaskName & ": due in " & (TaskAge - TaskPeriod)
+
+      If TaskType == "Interval" Then
+        Message += TaskName & ": due in " & (TaskPeriod - TaskAge)
+      Else
+        Message += TaskName & ": due on " & TaskPeriod
+      End If
     End If
 
   Loop
