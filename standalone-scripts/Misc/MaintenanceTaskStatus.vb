@@ -67,8 +67,10 @@ Sub Main(Param As Object)
       Message += "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & TaskAge
     End If
 
-    SendMessage("Maintenance Task Status",Message)
   Loop
+  If Message <> "" Then
+    SendMessage("Maintenance Task Status",Message)
+  End If
 End Sub
 ' ==============================================================================
 ' Send Message
