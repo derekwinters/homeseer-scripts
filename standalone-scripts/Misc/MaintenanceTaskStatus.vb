@@ -62,9 +62,9 @@ Sub Main(Param As Object)
 
       ' Add to message
       If Message <> "" Then
-        Message += "<br />"
+        Message += "<br /><br />"
       End If
-      Message += "ReferenceID: " & TaskId & " | Type: " & TaskType & " | Period: " & TaskPeriod & " | Name: " & TaskName & " | Age: " & TaskAge
+      Message += TaskName & ": due in " & (TaskAge - TaskPeriod)
     End If
 
   Loop
