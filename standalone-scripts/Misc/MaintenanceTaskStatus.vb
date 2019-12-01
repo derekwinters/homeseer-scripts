@@ -66,7 +66,7 @@ Sub Main(Param As Object)
       End If
 
       If TaskType = "Interval" Then
-        Message += TaskName & ": due in " & (TaskPeriod - TaskAge) & " days"
+        Message += "(" & TaskId  & ")" & TaskName & ": due in " & (TaskPeriod - TaskAge) & " days"
       Else
         Message += TaskName & ": due on " & TaskPeriod
       End If
