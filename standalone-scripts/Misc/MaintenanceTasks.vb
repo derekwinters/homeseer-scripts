@@ -44,6 +44,8 @@ Sub Main(Param As Object)
   Dim LastChange As Date
   Dim TaskMinDays As String
   Dim TurnOnDevice As Boolean
+  ' This variable is used to limit how often messages are sent
+  Dim TaskPeriodMod As Integer
 
   Do While Not Enumerator.Finished
     Device = Enumerator.GetNext
@@ -55,6 +57,7 @@ Sub Main(Param As Object)
     If (Device.Device_Type_String(hs).StartsWith("MaintenanceTask")) Then
       ' Reset
       TurnOnDevice = false
+      TaskPeriodMod = 0
 
       TaskId = Device.ref(hs)
       ' Parse DeviceTypeString
@@ -100,6 +103,21 @@ Sub Main(Param As Object)
             ' Check the interval against the setting
             If (TaskAge > TaskPeriod) Then
               TurnOnDevice = true
+
+              ' Check the TaskPeriod and set a sliding alert window to lower
+              ' the number of reminders each day (something that is only done
+              ' once a year doesn't need to send a reminder twice a day every
+              ' day until it's done).
+              If TaskPeriod > 300 Then
+                TaskPeriodMod = TaskAge Mod 7
+
+              Else If TaskPeriod > 180 Then
+                TaskPeriodMod = TaskAge Mod 4
+
+              Else If TaskPeriod > 60 Then
+                TaskPeriodMod = TaskAge Mod 2
+
+              End If
             End If
         End Select
       End If
@@ -116,8 +134,7 @@ Sub Main(Param As Object)
       End If
 
       ' If a Device is On, the task is due
-      If (hs.DeviceValue(TaskId) = 100) Then
-        ' The device is on, the task hasn't been completed
+      If (hs.DeviceValue(TaskId) = 100 And TaskPeriodMod = 0) Then
         Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId) & "<br /><br />Reply 'Task " & TaskId & " complete' to reset timer."
         SendMessage("Maintenance Task",Message)
         hs.WriteLog("Maintenance Task", Message)
