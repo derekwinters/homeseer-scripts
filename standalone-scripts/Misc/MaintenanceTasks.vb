@@ -104,20 +104,6 @@ Sub Main(Param As Object)
             If (TaskAge > TaskPeriod) Then
               TurnOnDevice = true
 
-              ' Check the TaskPeriod and set a sliding alert window to lower
-              ' the number of reminders each day (something that is only done
-              ' once a year doesn't need to send a reminder twice a day every
-              ' day until it's done).
-              If TaskPeriod > 300 Then
-                TaskPeriodMod = TaskAge Mod 7
-
-              Else If TaskPeriod > 180 Then
-                TaskPeriodMod = TaskAge Mod 4
-
-              Else If TaskPeriod > 60 Then
-                TaskPeriodMod = TaskAge Mod 2
-
-              End If
             End If
         End Select
       End If
@@ -131,6 +117,23 @@ Sub Main(Param As Object)
 
         ' Reset the LastChange
         hs.SetDeviceLastChange(TaskId,LastChange)
+      End If
+
+      If TaskType = "Interval" Then
+        ' Check the TaskPeriod and set a sliding alert window to lower
+        ' the number of reminders each day (something that is only done
+        ' once a year doesn't need to send a reminder twice a day every
+        ' day until it's done).
+        If TaskPeriod > 300 Then
+          TaskPeriodMod = TaskAge Mod 7
+
+        Else If TaskPeriod > 180 Then
+          TaskPeriodMod = TaskAge Mod 4
+
+        Else If TaskPeriod > 60 Then
+          TaskPeriodMod = TaskAge Mod 2
+
+        End If
       End If
 
       ' If a Device is On, the task is due
