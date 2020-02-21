@@ -73,7 +73,7 @@ Sub Main(parms As Object)
     ' ==========================================================================
     ' Initialize the desired temperature
     ' ==========================================================================
-    Dim DesiredWinter = 71
+    Dim DesiredWinter = 72
     Dim DesiredSummer = 75
 
     ' ==========================================================================
@@ -116,7 +116,7 @@ Sub Main(parms As Object)
       SetMode = 0
     Else
       ' Away
-      SetHeat = DesiredWinter - 8
+      SetHeat = DesiredWinter - 5
       SetCool = DesiredSummer + 1
       SetMode = 0
     End If
