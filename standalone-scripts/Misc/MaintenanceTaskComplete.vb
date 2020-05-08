@@ -25,6 +25,9 @@ Sub Main(Param As Object)
   
   ' Set the last change to the time the message was sent
   hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
+
+  ' Delete the email
+  hs.MailDelete(index)
 End Sub
 
 ' ==============================================================================
