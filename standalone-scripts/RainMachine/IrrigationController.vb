@@ -26,10 +26,10 @@ Sub Main(Parm As Object)
       hs.WriteLog("Irrigation Controller", "Manual Irrigation of " & Parm & " inches requested.")
 
       ' Run Irrigation
-      IrrigationRun(cint(Parm))
+      IrrigationRun(cdbl(Parm))
 
       ' Set the day0 device
-      hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + cint(Parm)), True)
+      'hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + cint(Parm)), True)
     Else
       hs.WriteLog("Irrigation Controller", "Non-numeric value provided, cannot process request. (Parm = " & Parm & ")")
     End If
@@ -113,12 +113,12 @@ Sub IrrigationRun (WaterNeeded As Double)
   ' Set the zone times
   ' ============================================================================
   ' Use the multiplier
-  Dim Zone1RunTime = Zone1Time * WaterNeeded * 10
-  Dim Zone2RunTime = Zone2Time * WaterNeeded * 10
-  Dim Zone3RunTime = Zone3Time * WaterNeeded * 10
-  Dim Zone4RunTime = Zone4Time * WaterNeeded * 10
-  Dim Zone5RunTime = Zone5Time * WaterNeeded * 10
-  Dim Zone6RunTime = Zone6Time * WaterNeeded * 10
+  Dim Zone1RunTime As Integer = Zone1Time * WaterNeeded * 10
+  Dim Zone2RunTime As Integer = Zone2Time * WaterNeeded * 10
+  Dim Zone3RunTime As Integer = Zone3Time * WaterNeeded * 10
+  Dim Zone4RunTime As Integer = Zone4Time * WaterNeeded * 10
+  Dim Zone5RunTime As Integer = Zone5Time * WaterNeeded * 10
+  Dim Zone6RunTime As Integer = Zone6Time * WaterNeeded * 10
 
   ' Log the zone times
   Message = "Beginning irrigation (Zone1: " & Zone1RunTime & " | Zone2: " & Zone2RunTime & " | Zone3: " & Zone3RunTime & " | Zone4: " & Zone4RunTime & " | Zone5: " & Zone5RunTime & " | Zone6: " & Zone6RunTime & ")"
@@ -126,30 +126,44 @@ Sub IrrigationRun (WaterNeeded As Double)
   Message = Message.Replace("(","<br />")
   Message = Message.Replace(" | "," minutes<br />")
   Message = Message.Replace(")"," minutes")
-  SendMessage("Rain Machine",Message)
+  'SendMessage("Rain Machine",Message)
 
   ' Set the program to run. Rain Machine will only allow one zone to run at
   ' a time, so there is no need to wait for zones to complete.
-  If WaterNeeded * 10 < 1 Then
-    ZoneController(Zone1,Zone1Time)
-    ZoneController(Zone2,Zone2Time)
-    ZoneController(Zone3,Zone3Time)
-    ZoneController(Zone4,Zone4Time)
-    ZoneController(Zone5,Zone5Time)
-    ZoneController(Zone6,Zone6Time)
-  Else
-    For run As Integer = 0 To ((WaterNeeded*10)-1)
-      ZoneController(Zone1,Zone1Time)
-      ZoneController(Zone2,Zone2Time)
-      ZoneController(Zone3,Zone3Time)
-      ZoneController(Zone4,Zone4Time)
-      ZoneController(Zone5,Zone5Time)
-      ZoneController(Zone6,Zone6Time)
+  ZoneController(Zone1,ZoneRun1Time)
+  ZoneController(Zone2,ZoneRun2Time)
+  ZoneController(Zone3,ZoneRun3Time)
+  ZoneController(Zone4,ZoneRun4Time)
+  ZoneController(Zone5,ZoneRun5Time)
+  ZoneController(Zone6,ZoneRun6Time)
 
-      ' Wait 10 seconds just to not run too fast
-      Threading.Thread.Sleep(10000)
-    Next
-  End If
+'  The API calls (either from the plugin or the API itself) don't let this
+'  make the zones do revolving runs. Subsequent calls to set up the addtional
+'  cycles do net get created. Holding off on this change until this functionality works
+'
+'  Dim RunLoops As Double = WaterNeeded * 10
+'  If RunLoops = 1 Then
+'    hs.WriteLog("Irrigation Controller","Running 1 loop.")
+'    Threading.Thread.Sleep(1000)
+'    ZoneController(Zone1,Zone1Time)
+'    ZoneController(Zone2,Zone2Time)
+'    ZoneController(Zone3,Zone3Time)
+'    ZoneController(Zone4,Zone4Time)
+'    ZoneController(Zone5,Zone5Time)
+'    ZoneController(Zone6,Zone6Time)
+'  Else
+'    Threading.Thread.Sleep(1000)
+'    For run As Integer = 0 To (RunLoops-1)
+'      hs.WriteLog("Irrigation Controller","Running loop " & run & ".")
+'      Threading.Thread.Sleep(1000)
+'      ZoneController(Zone1,Zone1Time)
+'      ZoneController(Zone2,Zone2Time)
+'      ZoneController(Zone3,Zone3Time)
+'      ZoneController(Zone4,Zone4Time)
+'      ZoneController(Zone5,Zone5Time)
+'      ZoneController(Zone6,Zone6Time)
+'    Next
+'  End If
   hs.WriteLog("Irrigation Controller","Irrigation configuration complete.")
 End Sub
 
