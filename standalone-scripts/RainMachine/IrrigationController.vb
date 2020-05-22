@@ -5,20 +5,34 @@
 ' for each zone on weather from the WeatherXML plugin.
 ' ==============================================================================
 Sub Main(Parm As Object)
-  ' Water received in the last four days
-  Dim RecentWaterTotal As Double = hs.DeviceValueEx(417)
+  If Parm Is Nothing Then
+    ' Water received in the last four days
+    Dim RecentWaterTotal As Double = hs.DeviceValueEx(417)
     
-  ' Standard desired water amount + carryover
-  Dim DesiredWaterInches As Double = hs.DeviceValueEx(408) + hs.DeviceValueEx(421)
+    ' Standard desired water amount + carryover
+    Dim DesiredWaterInches As Double = hs.DeviceValueEx(408) + hs.DeviceValueEx(421)
 
-  ' Check if the water received in the last four days is less than the desired
-  ' amount of water. If it is, calculate the water requirements.
-  If RecentWaterTotal < DesiredWaterInches Then
-    CalculateWaterRequirement(RecentWaterTotal,DesiredWaterInches)
+    ' Check if the water received in the last four days is less than the desired
+    ' amount of water. If it is, calculate the water requirements.
+    If RecentWaterTotal < DesiredWaterInches Then
+      CalculateWaterRequirement(RecentWaterTotal,DesiredWaterInches)
+    Else
+      Dim Message As String = "Enough water has been received in the last four days (received " & RecentWaterTotal & " inches, desired "& DesiredWaterInches &" inches), irrigation is not needed."
+      hs.WriteLog("Irrigation Controller", Message)
+      SendMessage("Rain Machine",Message)
+    End If
   Else
-    Dim Message As String = "Enough water has been received in the last four days (received " & RecentWaterTotal & " inches, desired "& DesiredWaterInches &" inches), irrigation is not needed."
-    hs.WriteLog("Irrigation Controller", Message)
-    SendMessage("Rain Machine",Message)
+    If IsNumeric(Parm) = True Then
+      hs.WriteLog("Irrigation Controller", "Manual Irrigation of " & Parm & " inches requested.")
+
+      ' Run Irrigation
+      IrrigationRun(cint(Parm))
+
+      ' Set the day0 device
+      hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
+    Else
+      hs.WriteLog("Irrigation Controller", "Non-numeric value provided, cannot process request. (Parm = " & Parm & ")")
+    End If
   End If
 End Sub
 
@@ -99,15 +113,15 @@ Sub IrrigationRun (WaterNeeded As Double)
   ' Set the zone times
   ' ============================================================================
   ' Use the multiplier
-  Zone1Time = Zone1Time * WaterNeeded * 10
-  Zone2Time = Zone2Time * WaterNeeded * 10
-  Zone3Time = Zone3Time * WaterNeeded * 10
-  Zone4Time = Zone4Time * WaterNeeded * 10
-  Zone5Time = Zone5Time * WaterNeeded * 10
-  Zone6Time = Zone6Time * WaterNeeded * 10
+  Dim Zone1RunTime = Zone1Time * WaterNeeded * 10
+  Dim Zone2RunTime = Zone2Time * WaterNeeded * 10
+  Dim Zone3RunTime = Zone3Time * WaterNeeded * 10
+  Dim Zone4RunTime = Zone4Time * WaterNeeded * 10
+  Dim Zone5RunTime = Zone5Time * WaterNeeded * 10
+  Dim Zone6RunTime = Zone6Time * WaterNeeded * 10
 
   ' Log the zone times
-  Message = "Beginning irrigation (Zone1: " & Zone1Time & " | Zone2: " & Zone2Time & " | Zone3: " & Zone3Time & " | Zone4: " & Zone4Time & " | Zone5: " & Zone5Time & " | Zone6: " & Zone6Time & ")"
+  Message = "Beginning irrigation (Zone1: " & Zone1RunTime & " | Zone2: " & Zone2RunTime & " | Zone3: " & Zone3RunTime & " | Zone4: " & Zone4RunTime & " | Zone5: " & Zone5RunTime & " | Zone6: " & Zone6RunTime & ")"
   hs.WriteLog("Irrigation Controller",Message)
   Message = Message.Replace("(","<br />")
   Message = Message.Replace(" | "," minutes<br />")
@@ -116,13 +130,26 @@ Sub IrrigationRun (WaterNeeded As Double)
 
   ' Set the program to run. Rain Machine will only allow one zone to run at
   ' a time, so there is no need to wait for zones to complete.
-  ZoneController(Zone1,Zone1Time)
-  ZoneController(Zone2,Zone2Time)
-  ZoneController(Zone3,Zone3Time)
-  ZoneController(Zone4,Zone4Time)
-  ZoneController(Zone5,Zone5Time)
-  ZoneController(Zone6,Zone6Time)
+  If WaterNeeded * 10 < 1 Then
+    ZoneController(Zone1,Zone1Time)
+    ZoneController(Zone2,Zone2Time)
+    ZoneController(Zone3,Zone3Time)
+    ZoneController(Zone4,Zone4Time)
+    ZoneController(Zone5,Zone5Time)
+    ZoneController(Zone6,Zone6Time)
+  Else
+    For run As Integer = 0 To ((WaterNeeded*10)-1)
+      ZoneController(Zone1,Zone1Time)
+      ZoneController(Zone2,Zone2Time)
+      ZoneController(Zone3,Zone3Time)
+      ZoneController(Zone4,Zone4Time)
+      ZoneController(Zone5,Zone5Time)
+      ZoneController(Zone6,Zone6Time)
 
+      ' Wait 10 seconds just to not run too fast
+      Threading.Thread.Sleep(10000)
+    Next
+  End If
   hs.WriteLog("Irrigation Controller","Irrigation configuration complete.")
 End Sub
 
