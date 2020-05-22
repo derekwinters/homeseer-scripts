@@ -29,7 +29,7 @@ Sub Main(Parm As Object)
       IrrigationRun(cint(Parm))
 
       ' Set the day0 device
-      hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
+      hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + cint(Parm)), True)
     Else
       hs.WriteLog("Irrigation Controller", "Non-numeric value provided, cannot process request. (Parm = " & Parm & ")")
     End If
