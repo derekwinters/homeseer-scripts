@@ -130,12 +130,12 @@ Sub IrrigationRun (WaterNeeded As Double)
 
   ' Set the program to run. Rain Machine will only allow one zone to run at
   ' a time, so there is no need to wait for zones to complete.
-  ZoneController(Zone1,ZoneRun1Time)
-  ZoneController(Zone2,ZoneRun2Time)
-  ZoneController(Zone3,ZoneRun3Time)
-  ZoneController(Zone4,ZoneRun4Time)
-  ZoneController(Zone5,ZoneRun5Time)
-  ZoneController(Zone6,ZoneRun6Time)
+  ZoneController(Zone1,Zone1RunTime)
+  ZoneController(Zone2,Zone2RunTime)
+  ZoneController(Zone3,Zone3RunTime)
+  ZoneController(Zone4,Zone4RunTime)
+  ZoneController(Zone5,Zone5RunTime)
+  ZoneController(Zone6,Zone6RunTime)
 
 '  The API calls (either from the plugin or the API itself) don't let this
 '  make the zones do revolving runs. Subsequent calls to set up the addtional
