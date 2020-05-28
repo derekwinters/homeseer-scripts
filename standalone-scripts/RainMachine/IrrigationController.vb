@@ -5,7 +5,7 @@
 ' for each zone on weather from the WeatherXML plugin.
 ' ==============================================================================
 Sub Main(Parm As Object)
-  If Parm Is Nothing Then
+  If Parm Is Nothing Or Parm = "" Then
     ' Water received in the last four days
     Dim RecentWaterTotal As Double = hs.DeviceValueEx(417)
     
@@ -29,7 +29,7 @@ Sub Main(Parm As Object)
       IrrigationRun(cdbl(Parm))
 
       ' Set the day0 device
-      'hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + cint(Parm)), True)
+      hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + cdbl(Parm)), True)
     Else
       hs.WriteLog("Irrigation Controller", "Non-numeric value provided, cannot process request. (Parm = " & Parm & ")")
     End If
