@@ -190,28 +190,40 @@ End Sub
 ' Adjust the set points for the thermostat based on the time of day.
 ' ==============================================================================
 Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef SetCool As Integer,ByRef SetMode As Integer,DesiredWinter As Integer,DesiredSummer As Integer)
-  ' Start by determining desired temperature based on the current time
-  If (CurrentHour >= 21 or CurrentHour < 5) Then
-    ' 9PM - 5AM
-    SetHeat = DesiredWinter - 4
-    SetCool = DesiredSummer - 2
-    SetMode = 0
-  ElseIf (CurrentHour >= 5 and CurrentHour < 8) Then
-    ' 5AM - 8AM
-    SetHeat = DesiredWinter + 1
-    SetCool = DesiredSummer - 1
-    SetMode = 1
-  ElseIf (CurrentHour >= 8 and CurrentHour < 19) Then
-    ' 8AM - 7PM
-    SetHeat = DesiredWinter
-    SetCool = DesiredSummer
-    SetMode = 0
-  Else
-    ' 7PM - 9PM
-    SetHeat = DesiredWinter -1
-    SetCool = DesiredSummer
-    SetMode = 0
-  End If
+  Select Case CurrentHour
+    Case 0 to 4
+      SetHeat = DesiredWinter - 3
+      SetCool = DesiredSummer - 1
+      SetMode = 0
+    Case 5 to 8
+      SetHeat = DesiredWinter + 1
+      SetCool = DesiredSummer - 1
+      SetMode = 0
+    Case 9
+      ' Summer: Cool down a little bit more after everyone is awake and ready,
+      ' but before the heat of the day starts.
+      SetHeat = DesiredWinter + 1
+      SetCool = DesiredSummer - 2
+      SetMode = 0
+    Case 10 to 13
+      SetHeat = DesiredWinter
+      SetCool = DesiredSummer
+      SetMode = 0
+    Case 14 to 18
+      ' Don't try to fight the afternoon sun. Let the temperature rise an extra
+      ' degree if it needs to.
+      SetHeat = DesiredWinter - 1
+      SetCool = DesiredSummer + 1
+      SetMode = 0
+    Case 19 to 20
+      SetHeat = DesiredWinter
+      SetCool = DesiredSummer
+      SetMode = 0
+    Case 21 to 23
+      SetHeat = DesiredWinter - 3
+      SetCool = DesiredSummer - 1
+      SetMode = 0
+  End Select
 End Sub
 
 ' ==============================================================================
