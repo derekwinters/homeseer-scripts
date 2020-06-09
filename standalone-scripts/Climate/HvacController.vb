@@ -30,6 +30,7 @@ Sub Main(parms As Object)
     Dim TemperatureHigh As Integer = hs.DeviceValue("409")
     Dim TemperatureLow As Integer = hs.DeviceValue("410")
     Dim HvacMode As Integer = hs.DeviceValue("46")
+    Dim CurrentHumidity As Integer = hs.DeviceValue("571")
 
     ' Current Home Occupancy Mode
     Dim OccupancyMode As Integer = hs.DeviceValue("75")
@@ -80,7 +81,7 @@ Sub Main(parms As Object)
     ' Adjust the desired temperature for extremes
     ' ==========================================================================
     ' Modify the set points based on the outside temperature and time of day
-    ExtremeTemperatureAdjustments(OutsideTemperature,TemperatureHigh,CurrentHour,DesiredWinter,DesiredSummer)
+    ExtremeTemperatureAdjustments(OutsideTemperature,TemperatureHigh,CurrentHour,CurrentHumidity,DesiredWinter,DesiredSummer)
 
     hs.WriteLog("HvacController", "Desired Winter: " & DesiredWinter & " | Desired Summer: " & DesiredSummer)
 
@@ -231,7 +232,7 @@ End Sub
 '
 ' Adjust the desired temperatures based on temperature extremes and time of day
 ' ==============================================================================
-Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh As Integer,CurrentHour As Integer,ByRef DesiredWinter As Integer,ByRef DesiredSummer As Integer)
+Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh As Integer,CurrentHour As Integer, CurrentHumidity As Integer, ByRef DesiredWinter As Integer,ByRef DesiredSummer As Integer)
   If (CurrentHour > 3 And CurrentHour < 9 And TemperatureHigh > 90) Then
     ' In the morning, if the high is over 90, lower the temperature by 1 degree
     ' to cool the house down before it gets warmer to make it easier to maintain
@@ -253,6 +254,13 @@ Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh 
     DesiredWinter = DesiredWinter - 2
   ElseIf (OutsideTemperature < 10) Then
     DesiredWinter = DesiredWinter - 1
+  End If
+
+  ' High Humidity
+  ' If the high is over 90 and the current RH is over 55%, add one degree
+  ' to ease the load on the A/C
+  If TemperatureHigh > 90 And CurrentHumidity > 55 Then
+    DesiredSummer = DesiredSummer + 1
   End If
 End Sub
 
