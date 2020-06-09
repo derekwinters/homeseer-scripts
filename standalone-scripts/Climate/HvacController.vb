@@ -26,9 +26,9 @@ Sub Main(parms As Object)
     ' Set Variables
     ' ==========================================================================
     ' Outside Temperature from WeatherXML
-    Dim OutsideTemperature As Integer = hs.DeviceValue("411")
-    Dim TemperatureHigh As Integer = hs.DeviceValue("409")
-    Dim TemperatureLow As Integer = hs.DeviceValue("410")
+    Dim OutsideTemperature As Integer = hs.DeviceValue("569")
+    Dim TemperatureHigh As Integer = hs.DeviceValue("572")
+    Dim TemperatureLow As Integer = hs.DeviceValue("573")
     Dim HvacMode As Integer = hs.DeviceValue("46")
     Dim CurrentHumidity As Integer = hs.DeviceValue("571")
 
