@@ -23,7 +23,7 @@ Sub Main(parms As Object)
 	Dim SetPointCooling          = hs.DeviceValue("49")                         ' Thermostat Cooling Setpoint
 	Dim SetPointHeating          = hs.DeviceValue("48")                         ' Thermostat Heating Setpoint
 	Dim CurrentTemperature       = hs.DeviceValue("43")                         ' Thermostat Current Temperature
-	Dim OutsideTemperature       = hs.DeviceValue("411")                        ' WeatherXML Home Temperature
+	Dim OutsideTemperature       = hs.DeviceValue("569")                        ' WeatherXML Home Temperature
 	
 	' Determine if the HVAC is currently running
 	If hs.DeviceValue("47") <> 0 Then

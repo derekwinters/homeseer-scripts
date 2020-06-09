@@ -8,8 +8,8 @@ Sub Main(Param As Object)
 	' ==========================================================================
 	' Get some basic info
 	' ==========================================================================
-    Dim TemperatureHigh As Integer = hs.DeviceValue("409")
-    Dim TemperatureLow As Integer = hs.DeviceValue("410")
+    Dim TemperatureHigh As Integer = hs.DeviceValue("572")
+    Dim TemperatureLow As Integer = hs.DeviceValue("573")
     Dim Message as String = ""
     Dim DeviceRefNum As Integer = 321
     

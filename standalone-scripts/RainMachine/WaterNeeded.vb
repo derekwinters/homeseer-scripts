@@ -5,8 +5,8 @@ Sub Main (Param As Object)
   ' Load Devices
   Dim DesiredWaterId As Integer = 408
   Dim DesiredWaterValue As Integer = hs.DeviceValue(DesiredWaterId)
-  Dim HighTemperature As Integer = hs.DeviceValue(410)
-  Dim LowTemperature As Integer = hs.DeviceValue(409)
+  Dim HighTemperature As Integer = hs.DeviceValue(572)
+  Dim LowTemperature As Integer = hs.DeviceValue(573)
 
   ' Adjust based on temperatures
   If LowTemperature > 45 Then
