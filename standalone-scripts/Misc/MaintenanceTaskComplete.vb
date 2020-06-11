@@ -10,21 +10,45 @@ Sub Main(Param As Object)
   index = hs.MailTrigger
   body = hs.MailText(index)
   body = String.Join("",body)
+  Dim Message As String
   Dim TaskString As String() = Split(body," ")
   Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
-  
+  Dim device = hs.GetDeviceByRef(TaskId)
+  Dim EmailFrom = hs.MailFrom(index)
+  Dim CompletedBy As String
+
   hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index))
-  
+
+  If (TaskString.Count > 3 And TaskString[TaskString.Count-1] = "Derek") Or (EmailFrom = hs.DeviceValue(168)) Then
+    CompletedBy = "Derek"
+  ElseIf (TaskString.Count > 3 And TaskString[TaskString.Count-1] = "Amy") Or (EmailFrom = hs.DeviceValue(167)) Then
+    CompletedBy = "Amy"
+  Else
+    CompletedBy = "Unknown"
+  End If
+
   ' Turn off the device if necessary
-  If (hs.DeviceValue(TaskId) <> 0) Then
+  If (hs.DeviceValue(TaskId) <> 0 And device.Location = "Maintenance" And device.Location2 = "Trackers") Then
     hs.SetDeviceValueByRef(TaskId,0,True)
-    SendMessage("Maintenance","Task " & TaskId & " marked complete at " & hs.MailDate(index))
+
+    Select Case CompletedBy
+      Case "Derek"
+        hs.SetDeviceValueByRef(562) = hs.DeviceValue(562) + 1
+        hs.SetDeviceValueByRef(564) = hs.DeviceValue(564) + 1
+      Case "Amy"
+        hs.SetDeviceValueByRef(563) = hs.DeviceValue(563) + 1
+        hs.SetDeviceValueByRef(565) = hs.DeviceValue(565) + 1
+    End Select
+
+    Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
+    hs.WriteLog("Maintenance Task Complete", Message)
+    SendMessage("Maintenance", Message)
+
+    ' Set the last change to the time the message was sent
+    hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
   Else
     SendMessage("Maintenance","Task " & TaskId & " already marked complete.")
   End If
-  
-  ' Set the last change to the time the message was sent
-  hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
 
   ' Delete the email
   hs.MailDelete(index)
