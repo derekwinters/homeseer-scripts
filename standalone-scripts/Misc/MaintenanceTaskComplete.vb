@@ -12,49 +12,52 @@ Sub Main(Param As Object)
   body = String.Join("",body)
   Dim Message As String
   Dim TaskString As String() = Split(body," ")
-  Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
-  Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
   Dim EmailFrom = hs.MailFrom(index)
-  Dim CompletedBy As String
+  
+  If TaskString(0) = "Task" And ( TaskString(2) = "complete" Or TaskString(2) = "completed") Then
+      Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
+      Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
+      Dim CompletedBy As String
+      
+      hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index))
 
-  hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index))
+      If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
+        CompletedBy = "Derek"
+      ElseIf (((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Amy")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(167)))) Then
+        CompletedBy = "Amy"
+      Else
+        CompletedBy = "Unknown"
+      End If
 
-  If ((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Derek")) Or ((TaskString.Count < 4) And EmailFrom = hs.DeviceString(168))) Then
-    CompletedBy = "Derek"
-  ElseIf ((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Amy")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(167))) Then
-    CompletedBy = "Amy"
-  Else
-    CompletedBy = "Unknown"
+      ' Turn off the device if necessary
+      'If (hs.DeviceValue(TaskId) <> 0 And device.Location2(hs) = "Trackers" And device.Location(hs) = "Maintenance") Then
+      If (hs.DeviceValue(TaskId) <> 0 ) Then
+        hs.SetDeviceValueByRef(TaskId,0,True)
+
+        Select Case CompletedBy
+          Case "Derek"
+            hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + 1, true)
+            hs.SetDeviceValueByRef(564, hs.DeviceValue(564) + 1, true)
+          Case "Amy"
+            hs.SetDeviceValueByRef(563, hs.DeviceValue(563) + 1, true)
+            hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + 1, true)
+        End Select
+
+        Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
+        hs.WriteLog("Maintenance Task Complete", Message)
+        
+        Message = Message & "<br /><br />Weekly Tasks Completed<br />Derek: " & hs.DeviceValue(562) & "<br />Amy: " & hs.DeviceValue(563) & "<br /><br />Monthly Tasks Completed<br />Derek: " & hs.DeviceValue(564) & "<br />Amy: " & hs.DeviceValue(565)
+        SendMessage("Maintenance", Message)
+
+        ' Set the last change to the time the message was sent
+        hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
+      Else
+        SendMessage("Maintenance","Task " & TaskId & " already marked complete.")
+      End If
+
+      ' Delete the email
+      hs.MailDelete(index)
   End If
-
-  ' Turn off the device if necessary
-  ' If (hs.DeviceValue(TaskId) <> 0 And device.Location2(hs) = "Trackers" And device.Location(hs) = "Maintenance") Then
-  If (hs.DeviceValue(TaskId) <> 0) Then
-    hs.SetDeviceValueByRef(TaskId,0,True)
-
-    Select Case CompletedBy
-      Case "Derek"
-        hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + 1, true)
-        hs.SetDeviceValueByRef(564, hs.DeviceValue(564) + 1, true)
-      Case "Amy"
-        hs.SetDeviceValueByRef(563, hs.DeviceValue(563) + 1, true)
-        hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + 1, true)
-    End Select
-
-    Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
-    hs.WriteLog("Maintenance Task Complete", Message)
-    
-    Message = Message & "<br /><br />Weekly Tasks Completed<br />Derek: " & hs.DeviceValue(562) & "<br />Amy: " & hs.DeviceValue(563) & "<br /><br />Monthly Tasks Completed<br />Derek: " & hs.DeviceValue(564) & "Amy: " & hs.DeviceValue(565)
-    SendMessage("Maintenance", Message)
-
-    ' Set the last change to the time the message was sent
-    hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
-  Else
-    SendMessage("Maintenance","Task " & TaskId & " already marked complete.")
-  End If
-
-  ' Delete the email
-  hs.MailDelete(index)
 End Sub
 
 ' ==============================================================================

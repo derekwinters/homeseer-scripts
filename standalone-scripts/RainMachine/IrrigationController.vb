@@ -126,7 +126,7 @@ Sub IrrigationRun (WaterNeeded As Double)
   Message = Message.Replace("(","<br />")
   Message = Message.Replace(" | "," minutes<br />")
   Message = Message.Replace(")"," minutes")
-  'SendMessage("Rain Machine",Message)
+  SendMessage("Rain Machine",Message)
 
   ' Set the program to run. Rain Machine will only allow one zone to run at
   ' a time, so there is no need to wait for zones to complete.
