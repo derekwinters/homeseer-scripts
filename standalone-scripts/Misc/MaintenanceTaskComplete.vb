@@ -14,7 +14,7 @@ Sub Main(Param As Object)
   Dim TaskString As String() = Split(body," ")
   Dim EmailFrom = hs.MailFrom(index)
   
-  If TaskString(0) = "Task" Then
+  If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
       Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
       Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
       Dim CompletedBy As String
