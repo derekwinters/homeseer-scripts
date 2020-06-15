@@ -14,7 +14,7 @@ Sub Main(Param As Object)
   Dim TaskString As String() = Split(body," ")
   Dim EmailFrom = hs.MailFrom(index)
   
-  If TaskString(0) = "Task" And ( TaskString(2) = "complete" Or TaskString(2) = "completed") Then
+  If TaskString(0) = "Task" Then
       Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
       Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
       Dim CompletedBy As String
@@ -58,7 +58,7 @@ Sub Main(Param As Object)
       ' Delete the email
       hs.MailDelete(index)
   Else
-    hs.WriteLog("Maintenance Task", "Not a valid string: " & TaskString(0) & " " & TaskString(2))
+    hs.WriteLog("Maintenance Task", "Not a valid task string: " TaskString(0) & " " & TaskString(2))
   End If
 End Sub
 
