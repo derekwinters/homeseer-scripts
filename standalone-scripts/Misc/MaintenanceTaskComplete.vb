@@ -58,7 +58,7 @@ Sub Main(Param As Object)
       ' Delete the email
       hs.MailDelete(index)
   Else
-    hs.WriteLog("Maintenance Task", "Not a valid string: " & TaskString)
+    hs.WriteLog("Maintenance Task", "Not a valid string: " & body)
   End If
 End Sub
 
