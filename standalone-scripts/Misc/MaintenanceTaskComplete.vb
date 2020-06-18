@@ -5,21 +5,28 @@
 ' will parse the body of the email to determine which task was completed.
 ' ==============================================================================
 Sub Main(Param As Object)
-  Dim index
-  Dim body as string
-  index = hs.MailTrigger
-  body = hs.MailText(index)
-  body = String.Join("",body)
-  Dim Message As String
-  Dim TaskString As String() = Split(body," ")
+  Dim index = hs.MailTrigger
+  ' TMobile started to send unknown leading and trailing characterscharacters.
+  ' Remove anything that isn't letters, numbers, or spaces, then trim any
+  ' potential leading or trailing spaces.
+  Imports System.Text.RegularExpressions
+  Dim body as String = Trim(Regex.Replace(hs.MailText(index), "[^a-zA-Z0-9 ]", ""))
+  ' Email address now can includes +1 at the start of the address.
   Dim EmailFrom = hs.MailFrom(index)
+  EmailFrom = Regex.Replace(EmailFrom, "[^a-zA-Z0-9 @\.]", "")
+  EmailFrom = Trim(EmailFrom)
+  EmailFrom = Regex.Replace(EmailFrom, "^1", "")
+  ' Split the message to parse later
+  Dim TaskString As String() = Split(body, " ")
+  ' Declare Message for later
+  Dim Message As String
   
   If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
       Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
       Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
       Dim CompletedBy As String
-      
-      hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index))
+
+      hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from " & EmailFrom & ")")
 
       If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
         CompletedBy = "Derek"
@@ -56,9 +63,10 @@ Sub Main(Param As Object)
       End If
 
       ' Delete the email
+      hs.WriteLog("Maintenance Task Complete", "Deleting email " & index)
       hs.MailDelete(index)
   Else
-    hs.WriteLog("Maintenance Task", "Not a valid task string: (" & TaskString(0) & ") (" & TaskString(2) & ")")
+    hs.WriteLog("Maintenance Task", "Not a valid task string: (" & body & ")")
   End If
 End Sub
 
