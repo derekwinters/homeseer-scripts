@@ -233,7 +233,7 @@ End Sub
 ' Adjust the desired temperatures based on temperature extremes and time of day
 ' ==============================================================================
 Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh As Integer,CurrentHour As Integer, CurrentHumidity As Integer, ByRef DesiredWinter As Integer,ByRef DesiredSummer As Integer)
-  If (CurrentHour > 3 And CurrentHour < 9 And TemperatureHigh > 90) Then
+  If (CurrentHour > 3 And CurrentHour < 9 And TemperatureHigh > 87) Then
     ' In the morning, if the high is over 90, lower the temperature by 1 degree
     ' to cool the house down before it gets warmer to make it easier to maintain
     ' the desired temperature later.
@@ -246,10 +246,19 @@ Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh 
 
   ' After the above section makes adjustments for the time and high for the day,
   ' adjust for the current temperature outside.
-  If (OutsideTemperature > 105) Then
+  ' The ASHRAE design temperatures (http://cms.ashrae.biz/weatherdata/STATIONS/726580_p.pdf)
+  '   1% Dry Bulb
+  '     Summer: 87.8
+  '     Winter: -19.7
+  '   0.4%/99.6%
+  '     Summer: 91.0
+  '     Winter: -25.7
+  If (OutsideTemperature > 91) Then
+    DesiredSummer = DesiredSummer + 4
+  ElseIf (OutsideTemperature > 87) Then
     DesiredSummer = DesiredSummer + 2
-  ElseIf (OutsideTemperature > 85) Then
-    DesiredSummer = DesiredSummer + 1
+  ElseIf (OutsideTemperature < -20) Then
+    DesiredWinter = DesiredWinter - 4
   ElseIf (OutsideTemperature < 0) Then
     DesiredWinter = DesiredWinter - 2
   ElseIf (OutsideTemperature < 10) Then
