@@ -138,7 +138,7 @@ Sub Main(Param As Object)
 
       ' If a Device is On, the task is due
       If (hs.DeviceValue(TaskId) = 100 And TaskPeriodMod = 0) Then
-        Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId) & "<br /><br />Reply 'Task " & TaskId & " complete' to reset timer."
+        Message = "Maintenance Task " & TaskId & ": " & TaskName & " is due today.<br /><br />It was last completed " & hs.DeviceDateTime(TaskId) & "<br /><br />Reply 'Task " & TaskId & " complete' to mark complete, or 'Task " & TaskId & " skipped' to reset the timer."
         SendMessage("Maintenance Task",Message)
         hs.WriteLog("Maintenance Task", Message)
         Message = ""
