@@ -21,53 +21,87 @@ Sub Main(Param As Object)
   ' Declare Message for later
   Dim Message As String
   
-  If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
-      Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
-      Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
-      Dim CompletedBy As String
+  If Trim(TaskString(0)) = "Task" Then
+    Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
+    Dim CompletedBy As String
 
+    If (Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
       hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from " & EmailFrom & ")")
 
-      If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
+      ' Check who completed the task
+      If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1)ToLower() = "derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
         CompletedBy = "Derek"
-      ElseIf (((TaskString.Count > 3) And (TaskString(TaskString.Count-1) = "Amy")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(167)))) Then
+      ElseIf (((TaskString.Count > 3) And (TaskString(TaskString.Count-1).ToLower() = "amy")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(167)))) Then
         CompletedBy = "Amy"
       Else
-        CompletedBy = "Unknown"
+        If (TaskString.Count > 3) Then
+          CompletedBy = "Unknown (" & TaskString(TaskString.Count-1) & ")"
+        Else
+          CompletedBy = "Unknown (" & EmailFrom & ")"
+        End If
       End If
 
-      ' Turn off the device if necessary
-      'If (hs.DeviceValue(TaskId) <> 0 And device.Location2(hs) = "Trackers" And device.Location(hs) = "Maintenance") Then
-      If (hs.DeviceValue(TaskId) <> 0 ) Then
-        hs.SetDeviceValueByRef(TaskId,0,True)
+      Select Case CompletedBy
+        Case "Derek"
+          hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + 1, true)
+          hs.SetDeviceValueByRef(564, hs.DeviceValue(564) + 1, true)
+        Case "Amy"
+          hs.SetDeviceValueByRef(563, hs.DeviceValue(563) + 1, true)
+          hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + 1, true)
+      End Select
 
-        Select Case CompletedBy
-          Case "Derek"
-            hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + 1, true)
-            hs.SetDeviceValueByRef(564, hs.DeviceValue(564) + 1, true)
-          Case "Amy"
-            hs.SetDeviceValueByRef(563, hs.DeviceValue(563) + 1, true)
-            hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + 1, true)
-        End Select
+      Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
 
-        Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
-        hs.WriteLog("Maintenance Task Complete", Message)
-        
-        Message = Message & "<br /><br />Weekly Tasks Completed<br />Derek: " & hs.DeviceValue(562) & "<br />Amy: " & hs.DeviceValue(563) & "<br /><br />Monthly Tasks Completed<br />Derek: " & hs.DeviceValue(564) & "<br />Amy: " & hs.DeviceValue(565)
-        SendMessage("Maintenance", Message)
+      CompleteTask(TaskId, Message, index)
+    Else If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "skip" Or Trim(TaskString(2)) = "skipped") Then
 
-        ' Set the last change to the time the message was sent
-        hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
+      ' Check who skipped the task
+      If EmailFrom = hs.DeviceString(168) Then
+        CompletedBy = "Derek"
+      ElseIf EmailFrom = hs.DeviceString(167) Then
+        CompletedBy = "Amy"
       Else
-        SendMessage("Maintenance","Task " & TaskId & " already marked complete.")
+        CompletedBy = "Unknown (" & EmailFrom & ")"
       End If
 
-      ' Delete the email
-      hs.WriteLog("Maintenance Task Complete", "Deleting email " & index)
-      hs.MailDelete(index)
+      Message = "Task " & TaskId & " skipped at " & hs.MailDate(index) & " by " & CompletedBy
+
+      CompleteTask(TaskId, Message, index)
+    Else
+      hs.WriteLog("Maintenance Task", "Not a valid task string: (" & body & ")")
+    End If
   Else
     hs.WriteLog("Maintenance Task", "Not a valid task string: (" & body & ")")
   End If
+End Sub
+
+Sub CompleteTask(TaskId As Integer, Message As String, index As Integer)
+  ' Turn off the device if necessary
+  'Dim device As Scheduler.Classes.DeviceClass = hs.GetDeviceByRef(TaskId)
+  'If (device.Location2(hs) = "Trackers" And device.Location(hs) = "Maintenance") Then
+  '  hs.SetDeviceValueByRef(TaskId,0,True)
+  '  ...
+  '  ...
+  'Else
+  '  hs.WriteLog("Maintenance Task Complete", "This is not a maintenance task ID")
+  'End If
+
+  If (hs.DeviceValue(TaskId) <> 0 Then
+    hs.SetDeviceValueByRef(TaskId,0,True)
+  End If
+
+  hs.WriteLog("Maintenance Task Complete", Message)
+
+  Message = Message & "<br /><br />Weekly Tasks Completed<br />Derek: " & hs.DeviceValue(562) & "<br />Amy: " & hs.DeviceValue(563) & "<br /><br />Monthly Tasks Completed<br />Derek: " & hs.DeviceValue(564) & "<br />Amy: " & hs.DeviceValue(565)
+  SendMessage("Maintenance", Message)
+
+  ' Set the last change to the time the message was sent
+  hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
+
+  ' Delete the email
+  hs.WriteLog("Maintenance Task Complete", "Deleting email " & index)
+  hs.MailDelete(index)
+
 End Sub
 
 ' ==============================================================================
