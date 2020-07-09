@@ -212,10 +212,10 @@ Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef S
       SetMode = 0
     Case 14 to 18
       ' Don't try to fight the afternoon sun. Let the temperature rise an extra
-      ' degree if it needs to.
+      ' degree if it needs to. Keep the fan running during this time.
       SetHeat = DesiredWinter - 1
       SetCool = DesiredSummer + 1
-      SetMode = 0
+      SetMode = 1
     Case 19 to 20
       SetHeat = DesiredWinter
       SetCool = DesiredSummer
