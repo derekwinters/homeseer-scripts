@@ -44,21 +44,21 @@ End Sub
 ' ==============================================================================
 Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As Double)
   ' Minimum Water (inches)
-  Dim MinimumWater As Double = 0.3
+  Dim MinimumWater As Double = 0.4
 
   ' Maximum Water (inches)
-  Dim MaximumWater As Double = 0.8
+  Dim MaximumWater As Double = 0.7
 
   ' Subtract the recent water from what is desired
   Dim WaterNeeded As Double = DesiredWaterInches - RecentWaterTotal
 
-  If WaterNeeded > MaximumWater Then
-    hs.WriteLog("Irrigation Controller","WaterNeeded (" & WaterNeeded & " inches) is greater than the maximum allowed (" & MaximumWater & " inches), resetting WaterNeeded.")
-    WaterNeeded = MaximumWater
-  End If
-
   ' Check if the water needed meeds the requirements
   If WaterNeeded >= MinimumWater Then
+    If WaterNeeded > MaximumWater Then
+      hs.WriteLog("Irrigation Controller","WaterNeeded (" & WaterNeeded & " inches) is greater than the maximum allowed (" & MaximumWater & " inches), resetting WaterNeeded.")
+      WaterNeeded = MaximumWater
+    End If
+
     hs.WriteLog("Irrigation Controller","A total of " & WaterNeeded & " inches of water are needed, running the irrigation system.")
 
     IrrigationRun(WaterNeeded)
@@ -67,9 +67,8 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
     hs.SetDeviceValueByRef(414,(hs.DeviceValue(414) + WaterNeeded), True)
 
     ' Clear the carryover
-    If hs.DeviceValue(421) <> 0 Then
-      hs.SetDeviceValueByRef(421,0,True)
-    End If
+    hs.SetDeviceValueByRef(421,0,True)
+
   ElseIf WaterNeeded > 0 Then
     Dim Message As String = "The water needed (" & WaterNeeded & " inches) is below the minimum threshold (" & MinimumWater & "/10 inches). This will be added to the next watering."
     hs.WriteLog("Irrigation Controller", Message)
@@ -91,18 +90,20 @@ Sub IrrigationRun (WaterNeeded As Double)
   hs.WriteLog("Irrigation Controller","Setting irrigation zones to water " & WaterNeeded & " inches.")
 
   ' RainMachine devices
-  Dim Zone1 As Integer = 387
-  Dim Zone2 As Integer = 388
-  Dim Zone3 As Integer = 389
-  Dim Zone4 As Integer = 390
-  Dim Zone5 As Integer = 391
-  Dim Zone6 As Integer = 392
+  Dim Zone1 As Integer = 574
+  Dim Zone2 As Integer = 575
+  Dim Zone3 As Integer = 576
+  Dim Zone4 As Integer = 577
+  Dim Zone5 As Integer = 578
+  Dim Zone6 As Integer = 579
+'  Dim Zone7 As Integer = 580
+'  Dim Zone8 As Integer = 581
 
   ' Zone runtime per 1/10 inch
   Dim Zone1Time As Integer = 10
   Dim Zone2Time As Integer = 10
-  Dim Zone3Time As Integer = 8
-  Dim Zone4Time As Integer = 8
+  Dim Zone3Time As Integer = 9
+  Dim Zone4Time As Integer = 9
   Dim Zone5Time As Integer = 5
   Dim Zone6Time As Integer = 5
 
