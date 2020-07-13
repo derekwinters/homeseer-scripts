@@ -29,7 +29,7 @@ Sub Main(Param As Object)
       hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from (" & EmailFrom & ")")
 
       ' Check who completed the task
-      If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1)ToLower() = "derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
+      If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1).ToLower() = "derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
         CompletedBy = "Derek"
       ElseIf (((TaskString.Count > 3) And (TaskString(TaskString.Count-1).ToLower() = "amy")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(167)))) Then
         CompletedBy = "Amy"
@@ -41,6 +41,8 @@ Sub Main(Param As Object)
         End If
       End If
 
+      Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
+
       Select Case CompletedBy
         Case "Derek"
           hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + 1, true)
@@ -50,11 +52,8 @@ Sub Main(Param As Object)
           hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + 1, true)
       End Select
 
-      Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy
-
       CompleteTask(TaskId, Message, index)
     Else If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "skip" Or Trim(TaskString(2)) = "skipped") Then
-
       ' Check who skipped the task
       If EmailFrom = hs.DeviceString(168) Then
         CompletedBy = "Derek"
