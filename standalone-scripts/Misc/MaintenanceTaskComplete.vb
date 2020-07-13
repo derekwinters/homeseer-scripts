@@ -26,7 +26,7 @@ Sub Main(Param As Object)
     Dim CompletedBy As String
 
     If (Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
-      hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from " & EmailFrom & ")")
+      hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from (" & EmailFrom & ")")
 
       ' Check who completed the task
       If (((TaskString.Count > 3) And (TaskString(TaskString.Count-1)ToLower() = "derek")) Or ((TaskString.Count < 4) And (EmailFrom = hs.DeviceString(168)))) Then
@@ -86,7 +86,7 @@ Sub CompleteTask(TaskId As Integer, Message As String, index As Integer)
   '  hs.WriteLog("Maintenance Task Complete", "This is not a maintenance task ID")
   'End If
 
-  If (hs.DeviceValue(TaskId) <> 0 Then
+  If hs.DeviceValue(TaskId) <> 0 Then
     hs.SetDeviceValueByRef(TaskId,0,True)
   End If
 
