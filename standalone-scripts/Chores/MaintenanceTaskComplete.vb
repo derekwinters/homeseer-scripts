@@ -4,6 +4,9 @@
 ' This script is trigger by an email being received with "Task" in the body. It
 ' will parse the body of the email to determine which task was completed.
 ' ==============================================================================
+
+Imports System.Globalization
+
 Sub Main(Param As Object)
   Dim index = hs.MailTrigger
   ' TMobile started to send unknown leading and trailing characterscharacters.
@@ -26,14 +29,18 @@ Sub Main(Param As Object)
     Dim CompletedBy As String
     Dim Score As Integer = ScoreTask(TaskId)
 
+    hs.WriteLog("Maintenance Task", "Task scored as " & Score)
+    
     ' Only contine if the task has been given a score
     If Score <> 0 Then
       ' If the message was simple, use the email address to determine the user
       If TaskString.Count < 4 Then
         CompletedBy = ConvertEmailToName(EmailFrom)
       Else
-        CompletedBy = (TaskString(TaskString.Count-1).ToTitleCase()
+        CompletedBy = TaskString(TaskString.Count-1)
       End If
+      
+      CompletedBy = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(CompletedBy)
 
       If (Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
         hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from (" & EmailFrom & ")")
