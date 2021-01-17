@@ -54,6 +54,9 @@
 07-05 - Kung Pao Chicken
 07-06 - General Tso's Chicken
 08-01 - Oven Nachos
+08-02 - Chicken Enchiladas
+08-03 - Huevos Rancheros
+08-04 - Cuban Sandwich
 09-01 - Chicken Caeser Wraps
 10-01 - Cheesy Broccoli Chicken and Rice Bowls
 10-02 - Pork Chops

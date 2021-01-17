@@ -23,50 +23,65 @@ Sub Main(Param As Object)
   Dim TaskString As String() = Split(body, " ")
   ' Declare Message for later
   Dim Message As String
+  Dim TaskName as String
   
   If Trim(TaskString(0)) = "Task" Then
     Dim TaskId As Integer = Convert.ToInt32(TaskString(1))
     Dim CompletedBy As String
     Dim Score As Integer = ScoreTask(TaskId)
+    TaskName = hs.DeviceName(TaskId).Replace("Trackers Maintenance",String.Empty)
 
     hs.WriteLog("Maintenance Task", "Task scored as " & Score)
     
-    ' Only contine if the task has been given a score
-    If Score <> 0 Then
-      ' If the message was simple, use the email address to determine the user
-      If TaskString.Count < 4 Then
+    ' If the message was simple, use the email address to determine the user
+    If TaskString.Count < 4 Then
         CompletedBy = ConvertEmailToName(EmailFrom)
-      Else
+    Else
         CompletedBy = TaskString(TaskString.Count-1)
-      End If
-      
-      CompletedBy = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(CompletedBy)
+    End If
 
-      If (Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
+    CompletedBy = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(CompletedBy)
+
+    If (Trim(TaskString(2)) = "complete" Or Trim(TaskString(2)) = "completed") Then
         hs.WriteLog("Maintenance Task Complete", "Task " & TaskId & " will be marked as complete. Message was received at " & hs.MailDate(index) & " from (" & EmailFrom & ")")
 
-        Message = "Task " & TaskId & " marked complete at " & hs.MailDate(index) & " by " & CompletedBy & " for " & Score & " points."
+        Message = "'" & TaskName & "' marked complete at " & hs.MailDate(index) & " by " & CompletedBy & " for " & Score & " points."
         Select Case CompletedBy
-          Case "Derek"
-            hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + Score, true)
-            hs.SetDeviceValueByRef(564, hs.DeviceValue(564) + Score, true)
-          Case "Amy"
-            hs.SetDeviceValueByRef(563, hs.DeviceValue(563) + Score, true)
-            hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + Score, true)
+            Case "Derek"
+                hs.SetDeviceValueByRef(562, hs.DeviceValue(562) + Score, true)
+                hs.SetDeviceValueByRef(564, hs.DeviceValue(564) + Score, true)
+            Case "Amy"
+                hs.SetDeviceValueByRef(563, hs.DeviceValue(563) + Score, true)
+                hs.SetDeviceValueByRef(565, hs.DeviceValue(565) + Score, true)
         End Select
         CompleteTask(TaskId, Message, index)
-      Else If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "skip" Or Trim(TaskString(2)) = "skipped") Then
-        Message = "Task " & TaskId & " skipped at " & hs.MailDate(index) & " by " & CompletedBy
+    Else If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "skip" Or Trim(TaskString(2)) = "skipped") Then
+        Message = "'" & TaskName & "' skipped at " & hs.MailDate(index) & " by " & CompletedBy
         CompleteTask(TaskId, Message, index)
-      Else
-        hs.WriteLog("Maintenance Task", "Not a valid task string: (" & body & ")")
-      End If
+    Else If Trim(TaskString(0)) = "Task" And ( Trim(TaskString(2)) = "due" ) Then
+        MarkTaskDue(TaskId)
+        ' Delete the email
+        hs.WriteLog("Maintenance Task", "Deleting email " & index)
+        hs.MailDelete(index)
     Else
-      hs.WriteLog("Maintenance Task", "Unknown Task Id (" & TaskId & ")")
+        hs.WriteLog("Maintenance Task", "Not a valid task string: (" & body & ")")
     End If
   Else
     hs.WriteLog("Maintenance Task", "Not a valid task string: (" & body & ")")
   End If
+End Sub
+
+Sub MarkTaskDue(TaskId As Integer)
+        Dim LastChange As Date
+        hs.WriteLog("Maintenance Task", "Task " & TaskId & " will be marked due.")
+        ' Save the LastChangeDateTime
+        LastChange = hs.DeviceDateTime(TaskId)
+
+        ' Turn the device on
+        hs.SetDeviceValueByRef(TaskId,100,True)
+
+        ' Reset the LastChange
+        hs.SetDeviceLastChange(TaskId,LastChange)
 End Sub
 
 ' ==============================================================================
@@ -87,7 +102,7 @@ Sub CompleteTask(TaskId As Integer, Message As String, index As Integer)
     hs.SetDeviceValueByRef(TaskId,0,True)
   End If
 
-  hs.WriteLog("Maintenance Task Complete", Message)
+  hs.WriteLog("Maintenance Task", Message)
 
   Message = Message & "<br /><br />Weekly Tasks Completed<br />Derek: " & hs.DeviceValue(562) & "<br />Amy: " & hs.DeviceValue(563) & "<br /><br />Monthly Tasks Completed<br />Derek: " & hs.DeviceValue(564) & "<br />Amy: " & hs.DeviceValue(565)
   SendMessage("Maintenance", Message)
@@ -96,7 +111,7 @@ Sub CompleteTask(TaskId As Integer, Message As String, index As Integer)
   hs.SetDeviceLastChange(TaskId,hs.MailDate(index))
 
   ' Delete the email
-  hs.WriteLog("Maintenance Task Complete", "Deleting email " & index)
+  hs.WriteLog("Maintenance Task", "Deleting email " & index)
   hs.MailDelete(index)
 End Sub
 
@@ -178,6 +193,14 @@ Private Function ScoreTask(TaskId As Integer) As Integer
     Case 588
       Return 3
     Case 589
+      Return 3
+    Case 620
+      Return 5
+    Case 625
+      Return 3
+    Case 626
+      Return 2
+    Case 627
       Return 3
     Case Else
       Return 0
