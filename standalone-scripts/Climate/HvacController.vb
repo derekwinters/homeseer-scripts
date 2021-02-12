@@ -74,7 +74,7 @@ Sub Main(parms As Object)
     ' ==========================================================================
     ' Initialize the desired temperature
     ' ==========================================================================
-    Dim DesiredWinter = 73
+    Dim DesiredWinter = 71
     Dim DesiredSummer = 74
 
     ' ==========================================================================
@@ -203,7 +203,7 @@ Sub TimeOfDayAdjustments(CurrentHour As Integer,ByRef SetHeat As Integer,ByRef S
     Case 9
       ' Summer: Cool down a little bit more after everyone is awake and ready,
       ' but before the heat of the day starts.
-      SetHeat = DesiredWinter + 1
+      SetHeat = DesiredWinter
       SetCool = DesiredSummer - 2
       SetMode = 0
     Case 10 to 13
@@ -259,6 +259,8 @@ Sub ExtremeTemperatureAdjustments(OutsideTemperature As Integer,TemperatureHigh 
     DesiredSummer = DesiredSummer + 2
   ElseIf (OutsideTemperature < -20) Then
     DesiredWinter = DesiredWinter - 4
+  ElseIf (OutsideTemperature < -10) Then
+    DesiredWinter = DesiredWinter - 3
   ElseIf (OutsideTemperature < 0) Then
     DesiredWinter = DesiredWinter - 2
   ElseIf (OutsideTemperature < 10) Then

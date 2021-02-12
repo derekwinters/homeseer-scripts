@@ -47,7 +47,7 @@ Sub CalculateWaterRequirement(RecentWaterTotal As Double,DesiredWaterInches As D
   Dim MinimumWater As Double = 0.4
 
   ' Maximum Water (inches)
-  Dim MaximumWater As Double = 0.7
+  Dim MaximumWater As Double = 0.5
 
   ' Subtract the recent water from what is desired
   Dim WaterNeeded As Double = DesiredWaterInches - RecentWaterTotal
@@ -100,10 +100,10 @@ Sub IrrigationRun (WaterNeeded As Double)
 '  Dim Zone8 As Integer = 581
 
   ' Zone runtime per 1/10 inch
-  Dim Zone1Time As Integer = 10
-  Dim Zone2Time As Integer = 10
-  Dim Zone3Time As Integer = 9
-  Dim Zone4Time As Integer = 9
+  Dim Zone1Time As Integer = 12
+  Dim Zone2Time As Integer = 12
+  Dim Zone3Time As Integer = 6
+  Dim Zone4Time As Integer = 6
   Dim Zone5Time As Integer = 5
   Dim Zone6Time As Integer = 5
 

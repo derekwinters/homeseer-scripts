@@ -16,19 +16,19 @@ Sub Main(Param as Object)
   ' Keep checking any existing emails
   While index >= 0
     ' Clean up the sender email address
-    emailFrom = Trim(Regex.Replace(hs.MailFrom(index), "[^a-zA-Z0-9 @\.], ""))
+    emailFrom = Trim(Regex.Replace(hs.MailFrom(index), "[^a-zA-Z0-9 @\.]", ""))
     emailFrom = Regex.Replace(emailFrom, "^1", "")
 
     hs.WriteLog("Mail Receiver", "Processing mail (" & index & ") from (" & emailFrom & ")")
 
     ' Validate Sender
-    dim ValideSenders = New List(Of String)({hs.DeviceString(167), hs.DeviceString(168)})
+    dim ValidSenders = New System.Collections.Generic.List(Of String)({hs.DeviceString(167), hs.DeviceString(168)})
 
-    if People.Contains(emailFrom)
+    if ValidSenders.Contains(emailFrom)
       ' Read the mail body. No need for any special characters.
       body = ""
       body = Trim(Regex.Replace(hs.MailText(index), "[^a-zA-Z0-9 ]", ""))
-
+ 
       ' Decide what to do with the email
       if Regex.IsMatch(body, "[Tt]ask \d+")
         ' This is a maintenance task action
@@ -44,14 +44,14 @@ Sub Main(Param as Object)
         hs.WriteLog("Mail Receiver", "Unknown message received")
       end if
       ' Delete the email
-      hs.MailDelete(index)
+      'hs.MailDelete(index)
     else
       ' Invalid Sender
       hs.WriteLog("Mail Receiver", "Invalid email (index: " & index & ") from (" & emailFrom & ")")
     end if
 
     ' Loop
-    index--
+    index = index - 1
 
   End While
 
